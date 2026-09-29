@@ -1,0 +1,579 @@
+/**
+ * app.js — Entry point DcemilinYuk (Laravel port)
+ * Import semua modul JS dan jalankan semua animasi section,
+ * setara komposisi App.tsx + tiap komponen versi React.
+ */
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+import { initLenis, scrollToSection } from './lenis-init'
+import {
+  initStaggerReveal,
+  initTextReveal,
+  initParallax,
+  initClipReveal,
+  initGalleryReveal,
+} from './scroll-reveal'
+
+gsap.registerPlugin(ScrollTrigger)
+
+/* ============================================
+   Preloader — counter 000-100 + curtain reveal
+   (port Preloader.tsx)
+   ============================================ */
+function initPreloader(onComplete) {
+  const container = document.getElementById('preloader')
+  const counterEl = document.getElementById('preloader-counter')
+  if (!container || !counterEl) {
+    onComplete()
+    return
+  }
+
+  const duration = 2500
+  const steps = 100
+  const interval = duration / steps
+  let current = 0
+  let hasCompleted = false
+
+  const finish = () => {
+    if (hasCompleted) return
+    hasCompleted = true
+    setTimeout(() => {
+      gsap.to(container, {
+        yPercent: -100,
+        duration: 0.8,
+        ease: 'power4.inOut',
+        onComplete,
+      })
+    }, 300)
+  }
+
+  const timer = setInterval(() => {
+    current++
+    counterEl.textContent = String(current).padStart(3, '0')
+    if (current >= steps) {
+      clearInterval(timer)
+      finish()
+    }
+  }, interval)
+
+  // Safety: jangan pernah biarkan preloader menggantung
+  setTimeout(finish, duration + 1000)
+}
+
+/* ============================================
+   Navigation — scrolled state, active underline,
+   mobile menu, smooth scroll (port Navigation.tsx)
+   ============================================ */
+function initNavigation(lenis) {
+  const navbar = document.getElementById('navbar')
+  const toggle = document.getElementById('mobile-toggle')
+  const mobileMenu = document.getElementById('mobile-menu')
+
+  // Scroll blur effect
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (navbar) navbar.classList.toggle('navbar--scrolled', window.scrollY > 20)
+    },
+    { passive: true }
+  )
+
+  // Active section via IntersectionObserver
+  const sectionIds = ['hero', 'products', 'about', 'contact']
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        document.querySelectorAll('.nav-links a[data-section]').forEach((link) => {
+          link.classList.toggle('active', link.dataset.section === entry.target.id)
+        })
+      })
+    },
+    { threshold: 0.3 }
+  )
+  sectionIds.forEach((id) => {
+    const el = document.getElementById(id)
+    if (el) observer.observe(el)
+  })
+
+  // Mobile menu toggle
+  if (toggle && mobileMenu) {
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('active')
+      mobileMenu.classList.toggle('active')
+    })
+  }
+
+  // Smooth scroll untuk semua link [data-scroll-to]
+  document.querySelectorAll('[data-scroll-to]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault()
+      if (toggle && mobileMenu) {
+        toggle.classList.remove('active')
+        mobileMenu.classList.remove('active')
+      }
+      scrollToSection(lenis, el.dataset.scrollTo)
+    })
+  })
+}
+
+/* ============================================
+   Hero — word-by-word reveal (port Hero.tsx)
+   ============================================ */
+function initHero() {
+  const title = document.getElementById('hero-title')
+  const content = document.getElementById('hero-content')
+  if (!title || !content) return
+
+  const words = title.querySelectorAll('.hero-word')
+  if (words.length) {
+    gsap.set(words, { y: 40, opacity: 0 })
+    gsap.to(words, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+      stagger: 0.05,
+      delay: 2.8,
+    })
+  }
+
+  gsap.fromTo(
+    content,
+    { opacity: 0, y: 30 },
+    { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 3.2 }
+  )
+}
+
+/* ============================================
+   Products — filter tab kategori (port Products.tsx)
+   ============================================ */
+function initProductFilter() {
+  const tabs = document.getElementById('product-tabs')
+  const grid = document.getElementById('products-grid')
+  if (!tabs || !grid) return
+
+  // Reveal pertama kali saat section masuk viewport
+  ScrollTrigger.create({
+    trigger: grid,
+    start: 'top 85%',
+    once: true,
+    onEnter: () => {
+      const cards = grid.querySelectorAll('.product-card')
+      gsap.fromTo(
+        cards,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.05 }
+      )
+    },
+  })
+
+  tabs.querySelectorAll('.product-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const filter = tab.dataset.filter
+
+      tabs.querySelectorAll('.product-tab').forEach((t) => t.classList.remove('product-tab--active'))
+      tab.classList.add('product-tab--active')
+
+      const cards = grid.querySelectorAll('.product-card')
+      cards.forEach((card) => {
+        const show = filter === 'all' || card.dataset.category === filter
+        card.style.display = show ? '' : 'none'
+      })
+
+      gsap.fromTo(
+        grid.querySelectorAll('.product-card:not([style*="none"])'),
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', stagger: 0.03 }
+      )
+    })
+  })
+}
+
+/* ============================================
+   PeelReveal — horizontal bars peel away
+   (port PeelReveal.tsx)
+   ============================================ */
+function initPeelReveal() {
+  const section = document.getElementById('peel')
+  const content = document.getElementById('peel-content')
+  const barsContainer = document.getElementById('peel-bars')
+  if (!section || !content || !barsContainer) return
+
+  const BAR_COUNT = 6
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const bar = document.createElement('div')
+    bar.className = 'peel__bar'
+    bar.style.height = `${100 / BAR_COUNT}%`
+    bar.style.top = `${(i / BAR_COUNT) * 100}%`
+    barsContainer.appendChild(bar)
+  }
+
+  const bars = barsContainer.querySelectorAll('.peel__bar')
+  const halfIndex = BAR_COUNT / 2
+
+  gsap.set(content, { opacity: 0, scale: 1.1 })
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: 'top 60%',
+      toggleActions: 'play none none none',
+    },
+  })
+
+  for (let i = 0; i < halfIndex; i++) {
+    tl.to(bars[i], { yPercent: -200, duration: 0.8, ease: 'power3.inOut' }, i * 0.05)
+  }
+  for (let i = halfIndex; i < BAR_COUNT; i++) {
+    tl.to(bars[i], { yPercent: 200, duration: 0.8, ease: 'power3.inOut' }, (BAR_COUNT - 1 - i) * 0.05)
+  }
+
+  tl.to(content, { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' }, 0.3)
+}
+
+/* ============================================
+   Featured — hero card + items slide-in
+   (port Featured.tsx)
+   ============================================ */
+function initFeatured() {
+  const layout = document.querySelector('[data-featured-reveal]')
+  if (!layout) return
+
+  const hero = layout.querySelector('.featured-hero')
+  const items = layout.querySelectorAll('.featured-item')
+
+  if (hero) {
+    gsap.set(hero, { x: -60, opacity: 0 })
+    gsap.to(hero, {
+      x: 0,
+      opacity: 1,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: layout, start: 'top 75%' },
+    })
+  }
+
+  if (items.length) {
+    gsap.set(items, { x: 60, opacity: 0 })
+    gsap.to(items, {
+      x: 0,
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+      stagger: 0.15,
+      scrollTrigger: { trigger: layout, start: 'top 75%' },
+    })
+  }
+}
+
+/* ============================================
+   SpecialtyDrinks — text scatter on hover
+   (port SpecialtyDrinks.tsx)
+   ============================================ */
+function initSpecialty() {
+  const list = document.querySelector('[data-specialty-list]')
+  if (!list) return
+  const items = list.querySelectorAll('.specialty-item')
+
+  // Scroll reveal staggered
+  gsap.fromTo(
+    items,
+    { y: 40, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.7,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: list, start: 'top 85%' },
+    }
+  )
+
+  // Scatter characters on hover
+  items.forEach((item) => {
+    const nameEl = item.querySelector('.specialty-item__name')
+    const bgEl = item.querySelector('.specialty-item__bg')
+    const descEl = item.querySelector('.specialty-item__desc')
+    if (!nameEl || !bgEl || !descEl) return
+
+    const text = nameEl.textContent || ''
+    nameEl.innerHTML = ''
+    ;[...text].forEach((char) => {
+      const span = document.createElement('span')
+      span.className = 'specialty-char'
+      span.textContent = char === ' ' ? '\u00A0' : char
+      nameEl.appendChild(span)
+    })
+
+    const chars = nameEl.querySelectorAll('.specialty-char')
+
+    item.addEventListener('mouseenter', () => {
+      gsap.to(bgEl, { opacity: 0.3, duration: 0.4 })
+      gsap.to(chars, {
+        x: () => gsap.utils.random(-30, 30),
+        y: () => gsap.utils.random(-20, 20),
+        rotation: () => gsap.utils.random(-15, 15),
+        duration: 0.4,
+        ease: 'power2.out',
+        stagger: 0.01,
+      })
+      gsap.to(descEl, { opacity: 1, y: 0, duration: 0.4, delay: 0.1 })
+    })
+
+    item.addEventListener('mouseleave', () => {
+      gsap.to(bgEl, { opacity: 0, duration: 0.3 })
+      gsap.to(chars, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: 'power3.out', stagger: 0.01 })
+      gsap.to(descEl, { opacity: 0, y: 10, duration: 0.3 })
+    })
+  })
+}
+
+/* ============================================
+   HorizontalScroll — GSAP pin + scrub
+   (port HorizontalScroll.tsx)
+   ============================================ */
+function initHorizontalScroll() {
+  const container = document.querySelector('[data-hscroll-container]')
+  const strip = document.querySelector('[data-hscroll-strip]')
+  if (!container || !strip) return
+
+  // Nonaktifkan animasi horizontal di mobile
+  if (window.innerWidth <= 768) {
+    strip.querySelectorAll('.hscroll__item').forEach((item) => {
+      gsap.set(item, { scale: 1, opacity: 1 })
+      const label = item.querySelector('.hscroll__item-label')
+      if (label) gsap.set(label, { opacity: 1, y: 0 })
+    })
+    return
+  }
+
+  const items = strip.querySelectorAll('.hscroll__item')
+  const getTotalWidth = () => strip.scrollWidth - window.innerWidth
+
+  const scrollTween = gsap.to(strip, {
+    x: () => -getTotalWidth(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: container,
+      start: 'center center',
+      end: () => `+=${getTotalWidth()}`,
+      scrub: 1,
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+    },
+  })
+
+  items.forEach((item, i) => {
+    gsap.set(item, { scale: 0.9 })
+
+    gsap.to(item, {
+      scale: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: container,
+        start: () => `left+=${(i / items.length) * getTotalWidth() - window.innerWidth * 0.3} center`,
+        end: () => `left+=${(i / items.length) * getTotalWidth() + window.innerWidth * 0.3} center`,
+        scrub: 1,
+        containerAnimation: scrollTween,
+      },
+    })
+
+    const label = item.querySelector('.hscroll__item-label')
+    if (label) {
+      gsap.fromTo(
+        label,
+        { opacity: 0, y: 15 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          scrollTrigger: {
+            trigger: container,
+            start: () => `left+=${(i / items.length) * getTotalWidth() - window.innerWidth * 0.2} center`,
+            end: () => `left+=${(i / items.length) * getTotalWidth()} center`,
+            scrub: 1,
+            containerAnimation: scrollTween,
+          },
+        }
+      )
+    }
+  })
+
+  setTimeout(() => ScrollTrigger.refresh(), 800)
+}
+
+/* ============================================
+   About — stat counter animation (port About.tsx)
+   ============================================ */
+function initAboutStats() {
+  const stats = document.querySelector('[data-stats-counter]')
+  if (!stats) return
+
+  stats.querySelectorAll('.about-stat__number').forEach((el) => {
+    const target = parseInt(el.getAttribute('data-target') || '0', 10)
+    const obj = { val: 0 }
+
+    gsap.to(obj, {
+      val: target,
+      duration: 2,
+      ease: 'power2.out',
+      snap: { val: 1 },
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        toggleActions: 'play none none none',
+      },
+      onUpdate: () => {
+        el.textContent = Math.round(obj.val).toString()
+      },
+    })
+  })
+}
+
+/* ============================================
+   Testimonials — auto-rotating quotes
+   (port Testimonials.tsx)
+   ============================================ */
+function initTestimonials() {
+  const root = document.querySelector('[data-testimonials]')
+  if (!root) return
+
+  const dataEl = root.querySelector('[data-testimonials-data]')
+  let testimonials = []
+  try {
+    testimonials = JSON.parse(dataEl?.textContent || '[]')
+  } catch {
+    testimonials = []
+  }
+  if (!testimonials.length) return
+
+  const card = root.querySelector('[data-testimonial-card]')
+  const starsEl = root.querySelector('[data-testimonial-stars]')
+  const textEl = root.querySelector('[data-testimonial-text]')
+  const avatarEl = root.querySelector('[data-testimonial-avatar]')
+  const nameEl = root.querySelector('[data-testimonial-name]')
+  const roleEl = root.querySelector('[data-testimonial-role]')
+  const dots = root.querySelectorAll('[data-testimonial-index]')
+
+  let active = 0
+  let timer = null
+
+  const render = (index) => {
+    const t = testimonials[index]
+    if (!t) return
+    if (starsEl) starsEl.textContent = '★'.repeat(t.stars)
+    if (textEl) textEl.textContent = `"${t.text}"`
+    if (avatarEl) avatarEl.textContent = t.author[0]
+    if (nameEl) nameEl.textContent = t.author
+    if (roleEl) roleEl.textContent = t.role
+    dots.forEach((d, i) => d.classList.toggle('testimonial-dot--active', i === index))
+
+    if (card) {
+      gsap.fromTo(
+        card,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
+      )
+    }
+  }
+
+  const startAutoRotate = () => {
+    timer = setInterval(() => {
+      active = (active + 1) % testimonials.length
+      render(active)
+    }, 4000)
+  }
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      active = parseInt(dot.dataset.testimonialIndex, 10)
+      if (timer) clearInterval(timer)
+      render(active)
+      startAutoRotate()
+    })
+  })
+
+  render(0)
+  startAutoRotate()
+}
+
+/* ============================================
+   CTA — scale-in banner (port CTA.tsx)
+   ============================================ */
+function initCTA() {
+  const banner = document.querySelector('[data-cta-banner]')
+  if (!banner) return
+
+  gsap.fromTo(
+    banner,
+    { opacity: 0, scale: 0.95 },
+    {
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: banner,
+        start: 'top 85%',
+        toggleActions: 'play none none none',
+      },
+    }
+  )
+}
+
+/* ============================================
+   Scroll progress bar (port App.tsx)
+   ============================================ */
+function initScrollProgress() {
+  const progressBar = document.getElementById('scroll-progress')
+  if (!progressBar) return
+
+  gsap.to(progressBar, {
+    scaleX: 1,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: document.body,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.3,
+    },
+  })
+}
+
+/* ============================================
+   Bootstrap — setara urutan mounting di App.tsx
+   ============================================ */
+function revealMain() {
+  document.getElementById('main')?.classList.add('main--visible')
+  ScrollTrigger.refresh()
+}
+
+// Preloader dulu, lalu main content muncul
+initPreloader(revealMain)
+
+// Lenis + GSAP sync (port useLenis.ts)
+const lenis = initLenis()
+
+// Navigasi & scroll progress
+initNavigation(lenis)
+initScrollProgress()
+
+// Animasi per section (port hooks useScrollReveal.ts)
+initHero()
+initStaggerReveal()
+initTextReveal()
+initParallax()
+initClipReveal()
+initGalleryReveal()
+initPeelReveal()
+initFeatured()
+initSpecialty()
+initHorizontalScroll()
+initAboutStats()
+initTestimonials()
+initCTA()
+initProductFilter()
