@@ -1,9 +1,9 @@
 {{-- HowToOrder: step cards dengan staggered reveal (port HowToOrder.tsx) --}}
-<section class="section" id="howto">
+<section class="section howto-section" id="howto">
     <div class="container">
         <div class="section-header">
             <div data-text-reveal>
-                <div class="section-subtitle text-sm">Cara Pesan</div>
+                <div class="section-label">Cara Pesan</div>
                 <h2 class="heading-lg">
                     <span class="text-line">Mudah & Cepat</span>
                     <span class="text-line">via <em>WhatsApp</em></span>

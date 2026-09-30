@@ -1,8 +1,8 @@
 {{-- Products: grid produk dari DB + filter tab kategori + tombol WA (port Products.tsx) --}}
-<section class="section" id="products" style="background: var(--color-bg-warm)">
+<section class="section products-section" id="products">
     <div class="container">
         <div class="section-header">
-            <div class="section-subtitle text-sm">Produk</div>
+            <div class="section-label">Katalog Produk</div>
             <h2 class="heading-lg">Semua <em>Produk</em> Kami</h2>
             <p class="text-body">Pilih cemilan dan minuman favoritmu, lalu pesan via WhatsApp!</p>
         </div>

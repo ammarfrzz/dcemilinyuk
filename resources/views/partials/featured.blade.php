@@ -3,7 +3,7 @@
     <div class="container">
         <div class="section-header">
             <div data-text-reveal>
-                <div class="section-subtitle text-sm">Best Seller</div>
+                <div class="section-label">Best Seller</div>
                 <h2 class="heading-lg">
                     <span class="text-line">Makanan</span>
                     <span class="text-line"><em>Terlaris</em></span>

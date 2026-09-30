@@ -1,8 +1,8 @@
 {{-- Categories: scroll reveal cards (port Categories.tsx) --}}
-<section class="section" id="categories">
+<section class="section categories-section" id="categories">
     <div class="container">
         <div class="section-header">
-            <div class="section-subtitle text-sm">Kategori</div>
+            <div class="section-label">Kategori</div>
             <h2 class="heading-lg">Pilih Kategori <em>Favoritmu</em></h2>
             <p class="text-body">Berbagai pilihan cemilan dan minuman dari pedagang kecil terbaik.</p>
         </div>

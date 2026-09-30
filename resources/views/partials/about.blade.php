@@ -1,5 +1,5 @@
 {{-- About: clip-path reveal + stat counter animation (port About.tsx) --}}
-<section class="section" id="about">
+<section class="section about-section" id="about">
     <div class="container">
         <div class="about-grid">
             <div class="about-image" data-clip-reveal>
@@ -9,7 +9,7 @@
 
             <div class="about-content">
                 <div class="about-title" data-text-reveal>
-                    <div class="section-subtitle text-sm">Tentang Kami</div>
+                    <div class="section-label section-label--outline">Tentang Kami</div>
                     <h2 class="heading-lg">Dibuat untuk <span class="text-accent">Pedagang Lokal</span></h2>
                 </div>
 
