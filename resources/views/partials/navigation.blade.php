@@ -5,11 +5,16 @@
             <span>{{ config('dcemilinyuk.brand') }}</span>
         </a>
 
-        <div class="nav-links">
-            <a href="#hero" data-scroll-to="hero" data-section="hero">Beranda</a>
-            <a href="#products" data-scroll-to="products" data-section="products">Produk</a>
+        <div class="nav-links" id="nav-links">
+            <a href="#hero" data-scroll-to="hero" data-section="hero" class="active">Beranda</a>
             <a href="#about" data-scroll-to="about" data-section="about">Tentang</a>
+            <a href="#peel" data-scroll-to="peel" data-section="peel">Kenapa Kami</a>
+            <a href="#howto" data-scroll-to="howto" data-section="howto">Cara Pesan</a>
+            <a href="#categories" data-scroll-to="categories" data-section="categories">Kategori</a>
+            <a href="#products" data-scroll-to="products" data-section="products">Produk</a>
+            <a href="#gallery" data-scroll-to="gallery" data-section="gallery">Galeri</a>
             <a href="#contact" data-scroll-to="contact" data-section="contact">Kontak</a>
+            <span class="nav-indicator" id="nav-indicator"></span>
         </div>
 
         <div class="nav-actions">
@@ -30,10 +35,14 @@
 </nav>
 
 <div class="mobile-menu" id="mobile-menu">
-    <a href="#hero" data-scroll-to="hero">Beranda</a>
-    <a href="#products" data-scroll-to="products">Produk</a>
-    <a href="#about" data-scroll-to="about">Tentang</a>
-    <a href="#contact" data-scroll-to="contact">Kontak</a>
+    <a href="#hero" data-scroll-to="hero" data-section="hero" class="active">Beranda</a>
+    <a href="#about" data-scroll-to="about" data-section="about">Tentang</a>
+    <a href="#peel" data-scroll-to="peel" data-section="peel">Kenapa Kami</a>
+    <a href="#howto" data-scroll-to="howto" data-section="howto">Cara Pesan</a>
+    <a href="#categories" data-scroll-to="categories" data-section="categories">Kategori</a>
+    <a href="#products" data-scroll-to="products" data-section="products">Produk</a>
+    <a href="#gallery" data-scroll-to="gallery" data-section="gallery">Galeri</a>
+    <a href="#contact" data-scroll-to="contact" data-section="contact">Kontak</a>
     <a href="https://wa.me/{{ config('dcemilinyuk.wa_number') }}"
        target="_blank" rel="noopener noreferrer" style="color: #25D366; font-weight: 600;">
         Hubungi via WhatsApp

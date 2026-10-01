@@ -62,39 +62,158 @@ function initPreloader(onComplete) {
 }
 
 /* ============================================
-   Navigation — scrolled state, active underline,
-   mobile menu, smooth scroll (port Navigation.tsx)
+   Navigation — scrolled state, sliding active indicator,
+   mobile menu, smooth scroll & real-time scrollspy
    ============================================ */
 function initNavigation(lenis) {
   const navbar = document.getElementById('navbar')
   const toggle = document.getElementById('mobile-toggle')
   const mobileMenu = document.getElementById('mobile-menu')
+  const navLinksContainer = document.getElementById('nav-links')
+  const indicator = document.getElementById('nav-indicator')
+  const desktopLinks = document.querySelectorAll('.nav-links a[data-section]')
+  const mobileLinks = document.querySelectorAll('.mobile-menu a[data-section]')
 
   // Scroll blur effect
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (navbar) navbar.classList.toggle('navbar--scrolled', window.scrollY > 20)
-    },
-    { passive: true }
-  )
+  const updateScrolledState = () => {
+    if (navbar) {
+      navbar.classList.toggle('navbar--scrolled', window.scrollY > 20)
+    }
+  }
+  window.addEventListener('scroll', updateScrolledState, { passive: true })
+  updateScrolledState()
 
-  // Active section via IntersectionObserver
-  const sectionIds = ['hero', 'products', 'about', 'contact']
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return
-        document.querySelectorAll('.nav-links a[data-section]').forEach((link) => {
-          link.classList.toggle('active', link.dataset.section === entry.target.id)
-        })
+  // Sliding indicator positioning
+  function moveIndicatorToLink(link) {
+    if (!indicator || !navLinksContainer) return
+    if (!link) {
+      indicator.style.opacity = '0'
+      return
+    }
+    const containerRect = navLinksContainer.getBoundingClientRect()
+    const linkRect = link.getBoundingClientRect()
+    const left = linkRect.left - containerRect.left
+    const width = linkRect.width
+
+    indicator.style.opacity = '1'
+    indicator.style.transform = `translateX(${left}px)`
+    indicator.style.width = `${width}px`
+  }
+
+  // Active section mapping (ordered from top to bottom)
+  const sectionMap = [
+    { id: 'hero', nav: 'hero' },
+    { id: 'about', nav: 'about' },
+    { id: 'peel', nav: 'peel' },
+    { id: 'howto', nav: 'howto' },
+    { id: 'categories', nav: 'categories' },
+    { id: 'featured', nav: 'products' }, // Makanan terlaris -> Produk
+    { id: 'products', nav: 'products' },
+    { id: 'gallery', nav: 'gallery' },
+    { id: 'testimonials', nav: 'gallery' }, // Testimoni -> Galeri
+    { id: 'contact', nav: 'contact' },
+  ]
+
+  let currentActiveNav = null
+  let isHovering = false
+
+  function setActiveNav(navId, forceMove = false) {
+    if (currentActiveNav === navId && !forceMove) return
+    currentActiveNav = navId
+
+    let activeEl = null
+    desktopLinks.forEach((link) => {
+      const match = link.dataset.section === navId
+      link.classList.toggle('active', match)
+      if (match) activeEl = link
+    })
+
+    mobileLinks.forEach((link) => {
+      link.classList.toggle('active', link.dataset.section === navId)
+    })
+
+    if (!isHovering && activeEl) {
+      moveIndicatorToLink(activeEl)
+    }
+  }
+
+  // Real-time scroll spy calculation
+  function calculateActiveSection() {
+    const scrollY = window.scrollY
+    const viewportHeight = window.innerHeight
+    const docHeight = document.documentElement.scrollHeight
+
+    // 1. Bottom of page -> contact
+    if (scrollY + viewportHeight >= docHeight - 80) {
+      return 'contact'
+    }
+
+    // 2. Very top of page -> hero
+    if (scrollY < 120) {
+      return 'hero'
+    }
+
+    // 3. Scan sections from bottom to top against the trigger point (35% from viewport top)
+    const triggerY = viewportHeight * 0.35
+
+    for (let i = sectionMap.length - 1; i >= 0; i--) {
+      const item = sectionMap[i]
+      const el = document.getElementById(item.id)
+      if (!el) continue
+
+      const rect = el.getBoundingClientRect()
+      // Section is active if its top has reached or passed trigger line,
+      // and its bottom hasn't scrolled completely past the navbar
+      if (rect.top <= triggerY && rect.bottom >= 70) {
+        return item.nav
+      }
+    }
+
+    return 'hero'
+  }
+
+  let ticking = false
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const activeNav = calculateActiveSection()
+        setActiveNav(activeNav)
+        ticking = false
       })
-    },
-    { threshold: 0.3 }
-  )
-  sectionIds.forEach((id) => {
-    const el = document.getElementById(id)
-    if (el) observer.observe(el)
+      ticking = true
+    }
+  }
+
+  // Hook scroll events (both native and Lenis)
+  window.addEventListener('scroll', onScroll, { passive: true })
+  if (lenis) {
+    lenis.on('scroll', onScroll)
+  }
+
+  // Hover animations for desktop navbar
+  desktopLinks.forEach((link) => {
+    link.addEventListener('mouseenter', () => {
+      isHovering = true
+      moveIndicatorToLink(link)
+    })
+  })
+
+  if (navLinksContainer) {
+    navLinksContainer.addEventListener('mouseleave', () => {
+      isHovering = false
+      const activeLink = navLinksContainer.querySelector('a.active')
+      if (activeLink) {
+        moveIndicatorToLink(activeLink)
+      } else {
+        indicator.style.opacity = '0'
+      }
+    })
+  }
+
+  // Window resize: recompute indicator position
+  window.addEventListener('resize', () => {
+    const activeLink = navLinksContainer?.querySelector('a.active')
+    if (activeLink) moveIndicatorToLink(activeLink)
   })
 
   // Mobile menu toggle
@@ -113,9 +232,22 @@ function initNavigation(lenis) {
         toggle.classList.remove('active')
         mobileMenu.classList.remove('active')
       }
-      scrollToSection(lenis, el.dataset.scrollTo)
+
+      const targetId = el.dataset.scrollTo
+      const matched = sectionMap.find((item) => item.id === targetId)
+      if (matched) {
+        setActiveNav(matched.nav, true)
+      }
+
+      scrollToSection(lenis, targetId)
     })
   })
+
+  // Initial call
+  setTimeout(() => {
+    const initialNav = calculateActiveSection()
+    setActiveNav(initialNav, true)
+  }, 150)
 }
 
 /* ============================================
@@ -550,6 +682,8 @@ function initScrollProgress() {
 function revealMain() {
   document.getElementById('main')?.classList.add('main--visible')
   ScrollTrigger.refresh()
+  window.dispatchEvent(new Event('scroll'))
+  window.dispatchEvent(new Event('resize'))
 }
 
 // Preloader dulu, lalu main content muncul

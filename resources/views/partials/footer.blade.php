@@ -10,8 +10,10 @@
                 <h4>Menu</h4>
                 <div class="footer-links">
                     <a href="#hero" data-scroll-to="hero">Beranda</a>
+                    <a href="#about" data-scroll-to="about">Tentang Kami</a>
+                    <a href="#peel" data-scroll-to="peel">Kenapa Kami</a>
+                    <a href="#howto" data-scroll-to="howto">Cara Pesan</a>
                     <a href="#products" data-scroll-to="products">Produk</a>
-                    <a href="#about" data-scroll-to="about">Tentang</a>
                     <a href="#contact" data-scroll-to="contact">Kontak</a>
                 </div>
             </div>

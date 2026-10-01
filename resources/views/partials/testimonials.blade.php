@@ -1,5 +1,5 @@
 {{-- Testimonials: auto-rotating quotes (port Testimonials.tsx) --}}
-<section class="section testimonials-section">
+<section class="section testimonials-section" id="testimonials">
     <div class="container">
         <div class="section-header">
             <div data-text-reveal>
