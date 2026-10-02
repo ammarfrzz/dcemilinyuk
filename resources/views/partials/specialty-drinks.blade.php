@@ -11,7 +11,7 @@
             'name' => 'Bolen Pisang',
             'description' => 'Bolen pisang homemade dengan kulit renyah dan isian pisang melimpah',
             'price' => 15000,
-            'image_url' => 'https://images.unsplash.com/photo-1609126953519-7f4a5b1e9e58?w=600&q=80',
+            'image_url' => 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',
         ],
         (object) [
             'name' => 'Risol Mayo',

@@ -574,7 +574,7 @@ function initTestimonials() {
   const root = document.querySelector('[data-testimonials]')
   if (!root) return
 
-  const dataEl = root.querySelector('[data-testimonials-data]')
+  const dataEl = document.getElementById('testimonials-json-data') || root.querySelector('[data-testimonials-data]')
   let testimonials = []
   try {
     testimonials = JSON.parse(dataEl?.textContent || '[]')
@@ -590,46 +590,111 @@ function initTestimonials() {
   const nameEl = root.querySelector('[data-testimonial-name]')
   const roleEl = root.querySelector('[data-testimonial-role]')
   const dots = root.querySelectorAll('[data-testimonial-index]')
+  const prevBtn = document.getElementById('testimonial-prev')
+  const nextBtn = document.getElementById('testimonial-next')
 
   let active = 0
   let timer = null
+  const duration = 4000
 
-  const render = (index) => {
+  const render = (index, animate = true) => {
     const t = testimonials[index]
     if (!t) return
-    if (starsEl) starsEl.textContent = '★'.repeat(t.stars)
-    if (textEl) textEl.textContent = `"${t.text}"`
-    if (avatarEl) avatarEl.textContent = t.author[0]
-    if (nameEl) nameEl.textContent = t.author
-    if (roleEl) roleEl.textContent = t.role
-    dots.forEach((d, i) => d.classList.toggle('testimonial-dot--active', i === index))
 
-    if (card) {
-      gsap.fromTo(
-        card,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
-      )
+    const updateContent = () => {
+      if (starsEl) {
+        let starsHtml = ''
+        for (let s = 0; s < (t.stars || 5); s++) {
+          starsHtml += '<i class="fa-solid fa-star"></i>'
+        }
+        starsEl.innerHTML = starsHtml
+      }
+      if (textEl) {
+        textEl.textContent = `"${t.text}"`
+      }
+      if (avatarEl) {
+        if (t.avatar) {
+          avatarEl.innerHTML = `<img src="${t.avatar}" alt="${t.author}" class="testimonial-avatar-img" loading="lazy">`
+        } else {
+          avatarEl.textContent = t.author ? t.author[0] : 'U'
+        }
+      }
+      if (nameEl) nameEl.textContent = t.author
+      if (roleEl) roleEl.textContent = t.role
+
+      dots.forEach((d, i) => d.classList.toggle('testimonial-dot--active', i === index))
+    }
+
+    if (animate && card && typeof gsap !== 'undefined') {
+      gsap.to(card, {
+        opacity: 0.3,
+        y: 8,
+        duration: 0.18,
+        ease: 'power2.in',
+        onComplete: () => {
+          updateContent()
+          gsap.to(card, {
+            opacity: 1,
+            y: 0,
+            duration: 0.35,
+            ease: 'power2.out',
+          })
+        },
+      })
+    } else {
+      updateContent()
+    }
+  }
+
+  const stopAutoRotate = () => {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
     }
   }
 
   const startAutoRotate = () => {
+    stopAutoRotate()
+
     timer = setInterval(() => {
       active = (active + 1) % testimonials.length
-      render(active)
-    }, 4000)
+      render(active, true)
+    }, duration)
+  }
+
+  const goTo = (index) => {
+    active = (index + testimonials.length) % testimonials.length
+    render(active, true)
+    startAutoRotate()
   }
 
   dots.forEach((dot) => {
     dot.addEventListener('click', () => {
-      active = parseInt(dot.dataset.testimonialIndex, 10)
-      if (timer) clearInterval(timer)
-      render(active)
-      startAutoRotate()
+      const idx = parseInt(dot.dataset.testimonialIndex, 10)
+      goTo(idx)
     })
   })
 
-  render(0)
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      goTo(active - 1)
+    })
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      goTo(active + 1)
+    })
+  }
+
+  if (card) {
+    card.addEventListener('mouseenter', stopAutoRotate)
+    card.addEventListener('mouseleave', startAutoRotate)
+    card.addEventListener('touchstart', stopAutoRotate, { passive: true })
+    card.addEventListener('touchend', startAutoRotate, { passive: true })
+  }
+
+  render(0, false)
   startAutoRotate()
 }
 
@@ -677,6 +742,150 @@ function initScrollProgress() {
 }
 
 /* ============================================
+   Hero Banner Carousel (Takapedia Style)
+   ============================================ */
+function initHeroBannerCarousel() {
+  const carousel = document.getElementById('banner-carousel')
+  if (!carousel) return
+
+  const slides = carousel.querySelectorAll('.banner-slide')
+  const dots = carousel.querySelectorAll('.banner-dot')
+  const prevBtn = document.getElementById('banner-prev')
+  const nextBtn = document.getElementById('banner-next')
+
+  if (!slides.length) return
+
+  let current = 0
+  let autoTimer = null
+  const total = slides.length
+  const intervalTime = 4500
+
+  const updateSlide = (index) => {
+    current = (index + total) % total
+
+    slides.forEach((slide, i) => {
+      if (i === current) {
+        slide.classList.add('banner-slide--active')
+        slide.setAttribute('aria-hidden', 'false')
+      } else {
+        slide.classList.remove('banner-slide--active')
+        slide.setAttribute('aria-hidden', 'true')
+      }
+    })
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('banner-dot--active', i === current)
+      dot.setAttribute('aria-current', i === current ? 'true' : 'false')
+    })
+  }
+
+  const nextSlide = () => updateSlide(current + 1)
+  const prevSlide = () => updateSlide(current - 1)
+
+  const startAuto = () => {
+    stopAuto()
+    autoTimer = setInterval(nextSlide, intervalTime)
+  }
+
+  const stopAuto = () => {
+    if (autoTimer) {
+      clearInterval(autoTimer)
+      autoTimer = null
+    }
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault()
+      nextSlide()
+      startAuto()
+    })
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault()
+      prevSlide()
+      startAuto()
+    })
+  }
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault()
+      const targetIndex = parseInt(dot.dataset.slide, 10)
+      if (!isNaN(targetIndex)) {
+        updateSlide(targetIndex)
+        startAuto()
+      }
+    })
+  })
+
+  // Pause on hover
+  carousel.addEventListener('mouseenter', stopAuto)
+  carousel.addEventListener('mouseleave', startAuto)
+
+  // Touch swipe gestures for mobile
+  let touchStartX = 0
+  let touchEndX = 0
+
+  carousel.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX
+  }, { passive: true })
+
+  carousel.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX
+    const diff = touchStartX - touchEndX
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
+      startAuto()
+    }
+  }, { passive: true })
+
+  updateSlide(0)
+  startAuto()
+}
+
+/* ============================================
+   Category Cards — filter & scroll to products
+   ============================================ */
+function initCategoryCardActions() {
+  const cards = document.querySelectorAll('.cat-card[data-category-filter]')
+  if (!cards.length) return
+
+  cards.forEach((card) => {
+    const handleAction = () => {
+      const catKey = card.dataset.categoryFilter
+      if (!catKey) return
+
+      // Find matching product tab
+      const tab = document.querySelector(`.product-tab[data-filter="${catKey}"]`)
+      if (tab) {
+        tab.click()
+      }
+
+      // Smooth scroll to products
+      const target = document.getElementById('products')
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+
+    card.addEventListener('click', handleAction)
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleAction()
+      }
+    })
+  })
+}
+
+/* ============================================
    Bootstrap — setara urutan mounting di App.tsx
    ============================================ */
 function revealMain() {
@@ -695,6 +904,10 @@ const lenis = initLenis()
 // Navigasi & scroll progress
 initNavigation(lenis)
 initScrollProgress()
+
+// Takapedia Hero Banner Carousel
+initHeroBannerCarousel()
+initCategoryCardActions()
 
 // Animasi per section (port hooks useScrollReveal.ts)
 initHero()
