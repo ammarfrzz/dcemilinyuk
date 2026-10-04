@@ -14,6 +14,7 @@ import {
   initClipReveal,
   initGalleryReveal,
 } from './scroll-reveal'
+import { initOrderModal } from './order-modal'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -924,3 +925,4 @@ initAboutStats()
 initTestimonials()
 initCTA()
 initProductFilter()
+initOrderModal(lenis)

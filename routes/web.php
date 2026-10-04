@@ -6,11 +6,19 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminStockController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Public Storefront
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Checkout & Multi-Step Payment Flow
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/pembayaran/{order_number}', [CheckoutController::class, 'payment'])->name('checkout.payment');
+Route::put('/pembayaran/{order_number}', [CheckoutController::class, 'update'])->name('checkout.update');
+Route::post('/pembayaran/{order_number}/konfirmasi', [CheckoutController::class, 'confirm'])->name('checkout.confirm');
+Route::get('/pesanan-berhasil/{order_number}', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Admin Authentication
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('login');

@@ -28,7 +28,7 @@
         [
             'text' => 'Awalnya cuma iseng beli basreng pedas daun jeruknya, eh ketagihan dong... gurih renyah dan bumbunya nampol, ga alot sama sekali. Auto langganan tetap!',
             'author' => 'Kak Bella',
-            'role' => 'Korban Racun Cemilan',
+            'role' => 'Penyuka Cemilan Pedas',
             'stars' => 5,
             'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
             'tag' => 'Pecinta Pedas Nampol',

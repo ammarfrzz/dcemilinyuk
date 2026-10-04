@@ -27,13 +27,19 @@
                         <p class="featured-hero__desc">{{ $heroProduct->description }}</p>
                         <div class="featured-hero__bottom">
                             <span class="featured-hero__price">{{ $heroProduct->formatted_price }}</span>
-                            <a href="{{ $heroProduct->whatsapp_order_url }}"
-                               target="_blank" rel="noopener noreferrer" class="btn-primary btn-primary--sm">
+                            <button type="button"
+                                    class="btn-primary btn-primary--sm js-open-order-modal"
+                                    data-id="{{ $heroProduct->id }}"
+                                    data-name="{{ $heroProduct->name }}"
+                                    data-price="{{ $heroProduct->price }}"
+                                    data-formatted-price="{{ $heroProduct->formatted_price }}"
+                                    data-image="{{ $heroProduct->image_url }}"
+                                    data-category="Best Seller">
                                 <span>Pesan Sekarang</span>
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                     <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -51,13 +57,19 @@
                             <h4 class="featured-item__name">{{ $item->name }}</h4>
                             <span class="featured-item__price">{{ $item->formatted_price }}</span>
                         </div>
-                        <a href="{{ $item->whatsapp_order_url }}"
-                           target="_blank" rel="noopener noreferrer" class="featured-item__link">
+                        <button type="button"
+                                class="featured-item__link js-open-order-modal"
+                                data-id="{{ $item->id }}"
+                                data-name="{{ $item->name }}"
+                                data-price="{{ $item->price }}"
+                                data-formatted-price="{{ $item->formatted_price }}"
+                                data-image="{{ $item->image_url }}"
+                                data-category="Best Seller">
                             Pesan
                             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                                 <path d="M3 8H13M13 8L8 3M13 8L8 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                        </a>
+                        </button>
                     </div>
                 @endforeach
             </div>

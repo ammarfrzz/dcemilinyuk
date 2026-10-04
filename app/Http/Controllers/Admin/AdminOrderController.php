@@ -103,7 +103,22 @@ class AdminOrderController extends Controller
 
     public function index(Request $request)
     {
-        $orders = self::getDummyOrders();
+        $dbOrders = \App\Models\Order::latest()->get()->map(function ($order) {
+            return (object) [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => $order->customer_name,
+                'customer_email' => $order->customer_email ?: '-',
+                'product_name' => $order->product_name . ' (' . $order->items_count . 'x)',
+                'order_date' => $order->order_date ? $order->order_date->format('d M Y') : $order->created_at->format('d M Y'),
+                'items_count' => $order->items_count,
+                'formatted_total' => $order->formatted_total,
+                'status' => $order->status,
+                'status_badge_class' => $order->status_badge_class,
+            ];
+        });
+
+        $orders = $dbOrders->concat(self::getDummyOrders());
 
         // Filter berdasarkan status
         if ($request->filled('status') && $request->status !== 'Semua') {
@@ -142,6 +157,13 @@ class AdminOrderController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        $order = \App\Models\Order::find($id);
+        if ($order) {
+            $order->status = $request->status;
+            $order->save();
+            return back()->with('success', "Status pesanan {$order->order_number} berhasil diubah menjadi '{$request->status}'.");
+        }
+
         return back()->with(
             'success',
             "Status pesanan berhasil diubah menjadi '{$request->status}' (Mode Dummy)."

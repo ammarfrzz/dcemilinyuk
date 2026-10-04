@@ -20,8 +20,8 @@
                 </p>
 
                 <p class="text-body about-desc">
-                    Dengan memesan melalui WhatsApp, prosesnya mudah dan cepat. Tidak perlu ribet,
-                    langsung chat dan pesan!
+                    Dengan sistem pemesanan online di website, prosesnya mudah, cepat, dan transparan.
+                    Pilih menu favoritmu dan bayar dengan Transfer Bank, QRIS, atau Bayar di Tempat (COD)!
                 </p>
 
                 <div class="about-stats" data-stats-counter>

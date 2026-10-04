@@ -6,23 +6,24 @@
                 <div class="section-label">Cara Pesan</div>
                 <h2 class="heading-lg">
                     <span class="text-line">Mudah & Cepat</span>
-                    <span class="text-line">via <em>WhatsApp</em></span>
+                    <span class="text-line">Pesan & <em>Bayar</em></span>
                 </h2>
             </div>
+            <p class="text-body">Pesan cemilan favoritmu langsung lewat website dengan 3 langkah mudah dan praktis.</p>
         </div>
 
         <div class="steps-grid" data-stagger-reveal data-reveal-target=".step-card">
             <div class="step-card">
                 <div class="step-card__media">
                     <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=80"
-                         alt="Pilih Produk" loading="lazy" class="step-card__img">
+                         alt="Pilih Menu" loading="lazy" class="step-card__img">
                     <div class="step-card__num">01</div>
                 </div>
                 <div class="step-card__body">
-                    <div class="step-card__icon"><i class="fa-solid fa-eye"></i></div>
-                    <h4 class="step-card__title">Pilih Produk</h4>
+                    <div class="step-card__icon"><i class="fa-solid fa-utensils"></i></div>
+                    <h4 class="step-card__title">Pilih Menu Favorit</h4>
                     <p class="step-card__desc text-body">
-                        Lihat katalog cemilan dan minuman lezat kami, lalu pilih menu favorit yang ingin kamu nikmati.
+                        Lihat katalog cemilan dan minuman lezat kami, lalu klik tombol <strong>Pesan Sekarang</strong> pada menu pilihanmu.
                     </p>
                 </div>
             </div>
@@ -30,29 +31,29 @@
             <div class="step-card">
                 <div class="step-card__media">
                     <img src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&auto=format&fit=crop&q=80"
-                         alt="Klik Pesan WA" loading="lazy" class="step-card__img">
+                         alt="Isi Data & Alamat" loading="lazy" class="step-card__img">
                     <div class="step-card__num">02</div>
                 </div>
                 <div class="step-card__body">
-                    <div class="step-card__icon"><i class="fa-solid fa-comment-dots"></i></div>
-                    <h4 class="step-card__title">Klik Pesan WA</h4>
+                    <div class="step-card__icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <h4 class="step-card__title">Isi Data & Alamat</h4>
                     <p class="step-card__desc text-body">
-                        Tekan tombol "Pesan" di produk pilihanmu. Pesan otomatis lengkap akan langsung tersusun di WhatsApp.
+                        Isi form data diri dan alamat pengantaran lengkap agar kurir kami dapat mengantarkan pesanan dengan tepat waktu.
                     </p>
                 </div>
             </div>
 
             <div class="step-card">
                 <div class="step-card__media">
-                    <img src="https://images.unsplash.com/photo-1526367790999-0150786686a2?w=500&auto=format&fit=crop&q=80"
-                         alt="Konfirmasi & Bayar" loading="lazy" class="step-card__img">
+                    <img src="https://images.unsplash.com/photo-1556742049-0a67c5574f73?w=500&auto=format&fit=crop&q=80"
+                         alt="Pilih Pembayaran" loading="lazy" class="step-card__img">
                     <div class="step-card__num">03</div>
                 </div>
                 <div class="step-card__body">
-                    <div class="step-card__icon"><i class="fa-solid fa-check"></i></div>
-                    <h4 class="step-card__title">Konfirmasi & Nikmati</h4>
+                    <div class="step-card__icon"><i class="fa-solid fa-credit-card"></i></div>
+                    <h4 class="step-card__title">Pilih Pembayaran & Nikmati</h4>
                     <p class="step-card__desc text-body">
-                        Konfirmasi pengiriman dan pembayaran dengan penjual. Makanan segar siap diantar langsung ke lokasimu!
+                        Review pesanan dan pilih metode pembayaran favoritmu: <strong>Transfer Bank, QRIS, atau COD</strong> saat pesanan tiba!
                     </p>
                 </div>
             </div>

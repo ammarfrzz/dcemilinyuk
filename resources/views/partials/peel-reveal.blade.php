@@ -28,7 +28,7 @@
                         <span class="peel__feature-icon"><i class="fa-solid fa-comments"></i></span>
                         <div>
                             <h4>Pesan Mudah</h4>
-                            <p class="text-body">Pesan via WhatsApp, praktis dan cepat.</p>
+                            <p class="text-body">Pesan langsung di website, praktis dan cepat.</p>
                         </div>
                     </div>
                 </div>

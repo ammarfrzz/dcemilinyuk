@@ -1,3 +1,5 @@
+@import './checkout.css';
+
 /* ============================================
    DcemilinYuk — Global Styles
    Tema: Light mode, Orange accent, Navy navbar
@@ -465,8 +467,10 @@ em { font-style: italic; color: var(--color-accent); }
   color: #fff !important;
 }
 
-.btn-wa.btn-sm { padding: 0.5rem 1rem; font-size: 0.8rem; }
+.btn-wa.btn-sm,
+.btn-nav-order.btn-sm { padding: 0.5rem 1rem; font-size: 0.8rem; }
 .btn-wa-text { white-space: nowrap; }
+.btn-nav-order { white-space: nowrap; }
 
 .mobile-toggle {
   display: none;
@@ -526,9 +530,12 @@ em { font-style: italic; color: var(--color-accent); }
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .mobile-toggle { display: flex; }
-  .btn-wa-text { display: none; }
-  .btn-wa.btn-sm { padding: 0.5rem; border-radius: 50%; width: 38px; height: 38px; justify-content: center; }
-  .btn-wa.btn-sm svg { flex-shrink: 0; }
+  .btn-wa-text,
+  .btn-nav-order span { display: none; }
+  .btn-wa.btn-sm,
+  .btn-nav-order.btn-sm { padding: 0.5rem; border-radius: 50%; width: 38px; height: 38px; justify-content: center; }
+  .btn-wa.btn-sm svg,
+  .btn-nav-order.btn-sm i { flex-shrink: 0; }
 }
 
 /* ============================================
@@ -1995,6 +2002,11 @@ em { font-style: italic; color: var(--color-accent); }
   letter-spacing: 0.05em;
   transition: color 0.3s;
   white-space: nowrap;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
 }
 
 .featured-item__link:hover { color: var(--color-accent); }

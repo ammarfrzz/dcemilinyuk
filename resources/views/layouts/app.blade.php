@@ -31,6 +31,8 @@
         <main class="main" id="main">
             @yield('content')
         </main>
+
+        @include('partials.order-modal')
     </div>
 </body>
 </html>
