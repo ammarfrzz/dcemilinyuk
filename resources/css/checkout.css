@@ -1377,40 +1377,144 @@ textarea.form-control {
 
 .receipt-table-wrap {
   overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background: #ffffff;
+  margin-top: 0.75rem;
 }
 
 .receipt-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
+  min-width: 500px;
+  border: none;
 }
 
-.receipt-table th {
-  text-align: left;
-  padding: 0.65rem 0.5rem;
+.receipt-table thead {
+  background: #F8FAFC;
+}
+
+.receipt-table thead th {
+  padding: 0.9rem 1rem;
   color: #64748B;
-  border-bottom: 1px solid #E2E8F0;
+  border: none;
+  border-bottom: 2px solid #E2E8F0;
   font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
-.receipt-table td {
-  padding: 0.85rem 0.5rem;
+.receipt-table tbody td {
+  padding: 1rem 1rem;
+  border: none;
   border-bottom: 1px solid #F1F5F9;
   color: #334155;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
-.receipt-table tfoot td {
-  padding: 0.65rem 0.5rem;
-  border-bottom: none;
-  font-size: 0.88rem;
+/* Kolom 1: Produk */
+.receipt-table .col-product {
+  width: 42%;
+  text-align: left;
+}
+
+.receipt-product-name {
+  color: #1E293B;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Kolom 2: Jumlah */
+.receipt-table .col-qty {
+  width: 14%;
+  text-align: center;
+  font-weight: 600;
   color: #475569;
 }
 
+/* Kolom 3: Harga Satuan */
+.receipt-table .col-price {
+  width: 22%;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #475569;
+}
+
+/* Kolom 4: Subtotal */
+.receipt-table .col-subtotal {
+  width: 22%;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #1E293B;
+}
+
+.subtotal-val {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* Utilities */
+.receipt-table .text-left { text-align: left !important; }
+.receipt-table .text-center { text-align: center !important; }
+.receipt-table .text-right { text-align: right !important; }
+
+/* Footer Nota */
+.receipt-table tfoot {
+  background: #FAFAFA;
+}
+
+.receipt-table tfoot td {
+  padding: 0.85rem 1rem;
+  border: none;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.receipt-table tfoot td.foot-label {
+  text-align: left;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.receipt-table tfoot td.foot-val {
+  text-align: right !important;
+  font-weight: 600;
+  color: #1E293B;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .receipt-table .total-row td {
-  border-top: 1.5px solid #CBD5E1;
-  font-size: 1.05rem;
-  padding-top: 0.85rem;
+  border: none;
+  border-top: 2px solid #E2E8F0;
+  background: #F8FAFC;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+}
+
+.receipt-table .total-row td.foot-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A2942;
+}
+
+.receipt-table .total-row td.foot-val,
+.receipt-table .total-row .total-amount {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FF6B00;
+  text-align: right !important;
 }
 
 .text-center { text-align: center; }

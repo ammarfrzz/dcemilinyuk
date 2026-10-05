@@ -23,12 +23,14 @@
 </head>
 <body>
     <div class="app">
-        @include('partials.preloader')
+        @if (request()->routeIs('home'))
+            @include('partials.preloader')
+        @endif
         <div class="grain"></div>
         <div class="scroll-progress" id="scroll-progress"></div>
         @include('partials.navigation')
 
-        <main class="main" id="main">
+        <main class="main {{ !request()->routeIs('home') ? 'main--visible' : '' }}" id="main">
             @yield('content')
         </main>
 

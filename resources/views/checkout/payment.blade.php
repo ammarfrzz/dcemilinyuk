@@ -143,7 +143,6 @@
                                             <i class="fa-solid fa-building-columns text-primary"></i>
                                             <span>Transfer Bank (BCA / Mandiri / BRI)</span>
                                         </div>
-                                        <span class="payment-badge">Bebas Antre</span>
                                     </div>
                                     <p class="payment-option-card__desc">Transfer langsung ke rekening resmi toko via ATM, Mobile Banking, atau Internet Banking.</p>
 
@@ -189,41 +188,8 @@
                                             <i class="fa-solid fa-qrcode text-accent"></i>
                                             <span>QRIS (Semua E-Wallet & M-Banking)</span>
                                         </div>
-                                        <span class="payment-badge payment-badge--instant">Instan & Praktis</span>
                                     </div>
                                     <p class="payment-option-card__desc">Scan QRIS menggunakan GoPay, OVO, Dana, ShopeePay, LinkAja, atau aplikasi m-Banking manapun.</p>
-
-                                    <div class="qris-display-box" id="qrisDisplayBox" style="display: none;">
-                                        <div class="qris-card">
-                                            <div class="qris-header">
-                                                <span class="qris-logo-text">QRIS</span>
-                                                <span class="qris-gpn-text">GPN</span>
-                                            </div>
-                                            <div class="qris-image-wrap">
-                                                {{-- QR Code dinamis via Google Charts API untuk nomor order --}}
-                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=00020101021226600016ID.CO.DCEMILINYUK.WWW01189360091800000000005204581253033605802ID5912DCEMILINYUK6007JAKARTA62070703A016304{{ $order->order_number }}"
-                                                     alt="QRIS DcemilinYuk" class="qris-image" loading="lazy">
-                                            </div>
-                                            <div class="qris-merchant-info">
-                                                <strong>{{ config('dcemilinyuk.brand') }} Official</strong>
-                                                <span>NMID: ID1020268899201</span>
-                                            </div>
-                                        </div>
-                                        <div class="qris-steps">
-                                            <div class="qris-step-item">
-                                                <span class="qris-step-num">1</span>
-                                                <span>Buka aplikasi E-Wallet (GoPay, OVO, Dana) atau Mobile Banking kamu.</span>
-                                            </div>
-                                            <div class="qris-step-item">
-                                                <span class="qris-step-num">2</span>
-                                                <span>Pilih menu <strong>Scan QR</strong> dan arahkan kamera ke barcode di atas.</span>
-                                            </div>
-                                            <div class="qris-step-item">
-                                                <span class="qris-step-num">3</span>
-                                                <span>Periksa nominal tagihan sesuai total pesanan, lalu selesaikan pembayaran.</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </label>
 
@@ -239,7 +205,6 @@
                                             <i class="fa-solid fa-hand-holding-dollar text-warning"></i>
                                             <span>Cash on Delivery (COD / Bayar di Tempat)</span>
                                         </div>
-                                        <span class="payment-badge payment-badge--cod">Bayar Pas Nyampe</span>
                                     </div>
                                     <p class="payment-option-card__desc">Bayar tunai langsung ke kurir saat pesanan hangatmu tiba di depan pintu.</p>
 
@@ -248,7 +213,7 @@
                                             <i class="fa-solid fa-shield-halved"></i>
                                             <div>
                                                 <strong>Ketentuan Bayar di Tempat (COD):</strong>
-                                                <p>Harap pastikan nomor WhatsApp aktif untuk konfirmasi kurir pengantar. Mohon siapkan uang pas sebesar <strong id="codTotalText">{{ $order->formatted_total }}</strong> saat kurir tiba.</p>
+                                                <p>Harap pastikan nomor WhatsApp aktif untuk konfirmasi kurir pengantar. Mohon siapkan uang pas sebesar <strong id="codTotalText">{{ $order->formatted_total }}</strong></p>
                                             </div>
                                         </div>
                                     </div>

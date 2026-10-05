@@ -85,8 +85,40 @@
                         <h4>Konfirmasi Pembayaran QRIS</h4>
                     </div>
                     <p class="action-card-text">
-                        Jika sudah melakukan scan dan transfer via QRIS sebesar <strong class="text-accent">{{ $order->formatted_total }}</strong>, simpan bukti tangkapan layar pembayaranmu dan konfirmasi ke admin kami.
+                        Silakan scan kode QRIS di bawah ini dengan total pembayaran <strong class="text-accent">{{ $order->formatted_total }}</strong>, simpan bukti tangkapan layar pembayaranmu dan konfirmasi ke admin kami via WhatsApp.
                     </p>
+
+                    <div class="qris-display-box" style="margin-top: 1.25rem;">
+                        <div class="qris-card">
+                            <div class="qris-header">
+                                <span class="qris-logo-text">QRIS</span>
+                                <span class="qris-gpn-text">GPN</span>
+                            </div>
+                            <div class="qris-image-wrap">
+                                {{-- QR Code dinamis via Google Charts API untuk nomor order --}}
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=00020101021226600016ID.CO.DCEMILINYUK.WWW01189360091800000000005204581253033605802ID5912DCEMILINYUK6007JAKARTA62070703A016304{{ $order->order_number }}"
+                                     alt="QRIS DcemilinYuk" class="qris-image" loading="lazy">
+                            </div>
+                            <div class="qris-merchant-info">
+                                <strong>{{ config('dcemilinyuk.brand') }} Official</strong>
+                                <span>NMID: ID1020268899201</span>
+                            </div>
+                        </div>
+                        <div class="qris-steps">
+                            <div class="qris-step-item">
+                                <span class="qris-step-num">1</span>
+                                <span>Buka aplikasi E-Wallet (GoPay, OVO, Dana) atau Mobile Banking kamu.</span>
+                            </div>
+                            <div class="qris-step-item">
+                                <span class="qris-step-num">2</span>
+                                <span>Pilih menu <strong>Scan QR</strong> dan arahkan kamera ke barcode di atas.</span>
+                            </div>
+                            <div class="qris-step-item">
+                                <span class="qris-step-num">3</span>
+                                <span>Periksa nominal tagihan sesuai total pesanan, lalu selesaikan pembayaran.</span>
+                            </div>
+                        </div>
+                    </div>
                 @else
                     <div class="action-card-header">
                         <i class="fa-solid fa-hand-holding-dollar text-warning"></i>
@@ -126,32 +158,40 @@
                     <table class="receipt-table">
                         <thead>
                             <tr>
-                                <th>Produk</th>
-                                <th class="text-center">Jumlah</th>
-                                <th class="text-right">Harga Satuan</th>
-                                <th class="text-right">Subtotal</th>
+                                <th class="col-product">Produk</th>
+                                <th class="col-qty text-center">Jumlah</th>
+                                <th class="col-price text-right">Harga Satuan</th>
+                                <th class="col-subtotal text-right">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>{{ $order->product_name }}</strong></td>
-                                <td class="text-center">{{ $order->items_count }}x</td>
-                                <td class="text-right">{{ $order->formatted_unit_price }}</td>
-                                <td class="text-right">Rp {{ number_format($order->unit_price * $order->items_count, 0, ',', '.') }}</td>
+                                <td class="col-product">
+                                    <strong class="receipt-product-name">{{ $order->product_name }}</strong>
+                                </td>
+                                <td class="col-qty text-center">
+                                    {{ $order->items_count }}x
+                                </td>
+                                <td class="col-price text-right">
+                                    {{ $order->formatted_unit_price }}
+                                </td>
+                                <td class="col-subtotal text-right">
+                                    <span class="subtotal-val">Rp {{ number_format($order->unit_price * $order->items_count, 0, ',', '.') }}</span>
+                                </td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="3" class="text-right">Ongkos Kirim:</td>
-                                <td class="text-right">{{ $order->formatted_shipping_fee }}</td>
+                                <td colspan="3" class="foot-label text-left">Ongkos Kirim:</td>
+                                <td class="col-subtotal foot-val text-right">{{ $order->formatted_shipping_fee }}</td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="text-right">Biaya Layanan:</td>
-                                <td class="text-right">Rp {{ number_format($order->service_fee, 0, ',', '.') }}</td>
+                                <td colspan="3" class="foot-label text-left">Biaya Layanan:</td>
+                                <td class="col-subtotal foot-val text-right">Rp {{ number_format($order->service_fee, 0, ',', '.') }}</td>
                             </tr>
                             <tr class="total-row">
-                                <td colspan="3" class="text-right"><strong>Total Pembayaran:</strong></td>
-                                <td class="text-right text-primary"><strong>{{ $order->formatted_total }}</strong></td>
+                                <td colspan="3" class="foot-label text-left"><strong>Total Pembayaran:</strong></td>
+                                <td class="col-subtotal foot-val text-right total-amount">{{ $order->formatted_total }}</td>
                             </tr>
                         </tfoot>
                     </table>
