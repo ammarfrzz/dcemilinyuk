@@ -4,6 +4,14 @@
 <div class="checkout-page checkout-page--success">
     <div class="container checkout-container checkout-container--narrow">
 
+        {{-- Tombol Navigasi Kembali ke Pembayaran / Ubah Pesanan --}}
+        <div class="checkout-top-bar">
+            <a href="{{ route('checkout.payment', $order->order_number) }}" class="btn-checkout-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Metode Pembayaran</span>
+            </a>
+        </div>
+
         {{-- Stepper Progress --}}
         <div class="checkout-stepper">
             <div class="step-item step-item--completed">

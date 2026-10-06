@@ -20,12 +20,19 @@ gsap.registerPlugin(ScrollTrigger)
 
 /* ============================================
    Preloader — counter 000-100 + curtain reveal
-   (port Preloader.tsx)
+   Hanya dijalankan pada kunjungan pertama customer di sesi ini
    ============================================ */
 function initPreloader(onComplete) {
   const container = document.getElementById('preloader')
   const counterEl = document.getElementById('preloader-counter')
   if (!container || !counterEl) {
+    onComplete()
+    return
+  }
+
+  // Jika customer sudah pernah melihat loading screen di sesi ini (misal kembali dari checkout)
+  if (sessionStorage.getItem('dc_has_seen_preloader')) {
+    container.style.display = 'none'
     onComplete()
     return
   }
@@ -39,6 +46,11 @@ function initPreloader(onComplete) {
   const finish = () => {
     if (hasCompleted) return
     hasCompleted = true
+    try {
+      sessionStorage.setItem('dc_has_seen_preloader', 'true')
+    } catch (e) {
+      // Ignore sessionStorage quota / private browsing errors
+    }
     setTimeout(() => {
       gsap.to(container, {
         yPercent: -100,

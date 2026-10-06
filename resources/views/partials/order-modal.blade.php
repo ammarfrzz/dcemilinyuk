@@ -4,7 +4,6 @@
         {{-- Header Modal (Fixed / Non-scroll) --}}
         <div class="order-modal__header">
             <div class="order-modal__header-left">
-                <span class="order-modal__step-badge">Langkah 1 dari 2</span>
                 <h3 class="order-modal__title" id="orderModalTitle">Formulir Pemesanan</h3>
                 <p class="order-modal__subtitle">Lengkapi data diri dan alamat pengiriman pesananmu.</p>
             </div>

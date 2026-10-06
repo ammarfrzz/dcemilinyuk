@@ -4,6 +4,14 @@
 <div class="checkout-page">
     <div class="container checkout-container">
 
+        {{-- Tombol Navigasi Kembali --}}
+        <div class="checkout-top-bar">
+            <a href="{{ route('home') }}#products" class="btn-checkout-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Pilihan Menu</span>
+            </a>
+        </div>
+
         {{-- Stepper Progress --}}
         <div class="checkout-stepper">
             <div class="step-item step-item--completed">
@@ -222,12 +230,16 @@
 
                         </div>
 
-                        {{-- Tombol Konfirmasi Selesai --}}
+                        {{-- Tombol Konfirmasi Selesai & Tombol Kembali --}}
                         <div class="checkout-submit-wrap">
                             <button type="submit" class="btn-primary btn-checkout-submit">
                                 <span>Konfirmasi & Selesaikan Pesanan</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
+                            <a href="{{ route('home') }}#products" class="btn-checkout-back-secondary">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Kembali / Ubah Pilihan Cemilan</span>
+                            </a>
                             <p class="checkout-guarantee-text">
                                 <i class="fa-solid fa-lock"></i> Transaksi aman & data pengiriman kamu terjamin kerahasiaannya.
                             </p>
