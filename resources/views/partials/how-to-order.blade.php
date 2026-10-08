@@ -15,8 +15,7 @@
         <div class="steps-grid" data-stagger-reveal data-reveal-target=".step-card">
             <div class="step-card">
                 <div class="step-card__media">
-                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=80"
-                         alt="Pilih Menu" loading="lazy" class="step-card__img">
+                    <img src="{{ asset('images/howto/step-1.webp') }}" alt="Pilih Menu" loading="lazy" class="step-card__img">
                     <div class="step-card__num">01</div>
                 </div>
                 <div class="step-card__body">
@@ -30,8 +29,7 @@
 
             <div class="step-card">
                 <div class="step-card__media">
-                    <img src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&auto=format&fit=crop&q=80"
-                         alt="Isi Data & Alamat" loading="lazy" class="step-card__img">
+                    <img src="{{ asset('images/howto/step-2.webp') }}" alt="Isi Data & Alamat" loading="lazy" class="step-card__img">
                     <div class="step-card__num">02</div>
                 </div>
                 <div class="step-card__body">
@@ -45,8 +43,7 @@
 
             <div class="step-card">
                 <div class="step-card__media">
-                    <img src="https://images.unsplash.com/photo-1556742049-0a67c5574f73?w=500&auto=format&fit=crop&q=80"
-                         alt="Pilih Pembayaran" loading="lazy" class="step-card__img">
+                    <img src=" {{ asset('images/howto/step-3.webp') }}" alt="Pilih Pembayaran" loading="lazy" class="step-card__img">
                     <div class="step-card__num">03</div>
                 </div>
                 <div class="step-card__body">

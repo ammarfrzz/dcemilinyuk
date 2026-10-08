@@ -3,27 +3,21 @@
     $signatureItems = $minumanProducts ?? collect([
         (object) [
             'name' => 'Es Teh Tarik',
-            'description' => 'Teh tarik premium dengan rasa creamy dan manis yang pas',
+            'description' => 'Teh tarik premium dengan rasa creamy, buih melimpah, dan manis yang pas',
             'price' => 8000,
-            'image_url' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=80',
-        ],
-        (object) [
-            'name' => 'Bolen Pisang',
-            'description' => 'Bolen pisang homemade dengan kulit renyah dan isian pisang melimpah',
-            'price' => 15000,
-            'image_url' => 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',
-        ],
-        (object) [
-            'name' => 'Risol Mayo',
-            'description' => 'Risol isi mayo dan smoked beef, dibalut tepung roti yang renyah',
-            'price' => 3000,
-            'image_url' => 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&q=80',
+            'image_url' => asset('images/products/es-teh-tarik.webp'),
         ],
         (object) [
             'name' => 'Kopi Susu',
-            'description' => 'Kopi susu kekinian dengan campuran espresso dan susu segar',
+            'description' => 'Kopi susu gula aren kekinian dengan perpaduan espresso mantap dan susu segar creamy',
             'price' => 12000,
-            'image_url' => 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80',
+            'image_url' => asset('images/products/kopi-susu.webp'),
+        ],
+        (object) [
+            'name' => 'Es Buah',
+            'description' => 'Es buah segar aneka buah tropis manis dengan sirup dan susu creamy menyegarkan',
+            'price' => 10000,
+            'image_url' => asset('images/products/es-buah.webp'),
         ],
     ]);
 @endphp

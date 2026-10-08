@@ -263,7 +263,7 @@
                             @if ($order->product)
                                 <img src="{{ $order->product->image_url }}" alt="{{ $order->product_name }}" loading="lazy">
                             @else
-                                <img src="https://images.unsplash.com/photo-1541529086526-db283c563270?w=600&auto=format&fit=crop&q=80" alt="{{ $order->product_name }}" loading="lazy">
+                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&fm=webp&q=80" alt="{{ $order->product_name }}" loading="lazy">
                             @endif
                         </div>
                         <div class="order-item-detail__info">

@@ -13,12 +13,12 @@
 
         @php
             $galleryImages = [
-                ['src' => 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80', 'alt' => 'Cemilan lezat', 'span' => 'wide'],
-                ['src' => 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80', 'alt' => 'Kopi susu', 'span' => 'tall'],
-                ['src' => 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&q=80', 'alt' => 'Donat & pastry', 'span' => 'normal'],
-                ['src' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80', 'alt' => 'Nasi uduk', 'span' => 'normal'],
-                ['src' => 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=600&q=80', 'alt' => 'Roti & bakery', 'span' => 'wide'],
-                ['src' => 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80', 'alt' => 'Makanan segar', 'span' => 'normal'],
+                ['src' => asset('images/products/risol-mayo.webp'), 'alt' => 'Risol & Gorengan Renyah', 'span' => 'wide'],
+                ['src' => asset('images/products/kopi-susu.webp'), 'alt' => 'Kopi Susu Gula Aren', 'span' => 'tall'],
+                ['src' => asset('images/products/donat-kentang.webp'), 'alt' => 'Donat Kentang Manis', 'span' => 'normal'],
+                ['src' => asset('images/products/chicken-katsu.webp'), 'alt' => 'Chicken Katsu Crispy', 'span' => 'normal'],
+                ['src' => asset('images/products/bolen-pisang.webp'), 'alt' => 'Bolen Pisang Renyah', 'span' => 'wide'],
+                ['src' => asset('images/products/es-teh-tarik.webp'), 'alt' => 'Es Teh Tarik Segar', 'span' => 'normal'],
             ];
         @endphp
 

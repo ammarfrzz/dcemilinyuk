@@ -3,7 +3,7 @@
     <div class="container">
         <div class="about-grid">
             <div class="about-image" data-clip-reveal>
-                <img src="https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80"
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&fm=webp&q=80"
                      alt="Pedagang lokal DcemilinYuk">
             </div>
 

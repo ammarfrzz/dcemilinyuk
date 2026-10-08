@@ -7,7 +7,7 @@
 
                 {{-- Slide 1: Risol Mayo & Aneka Gorengan --}}
                 <div class="banner-slide banner-slide--active" data-slide-index="0"
-                     style="--slide-bg: url('https://images.unsplash.com/photo-1541529086526-db283c563270?w=1600&auto=format&fit=crop&q=80')">
+                     style="--slide-bg: url('{{ asset('images/hero/hero-slide-1.webp') }}')">
                     <div class="banner-slide__bg"></div>
                     <div class="banner-slide__overlay"></div>
                     <div class="banner-slide__content">
@@ -27,7 +27,7 @@
 
                 {{-- Slide 2: Minuman Segar --}}
                 <div class="banner-slide" data-slide-index="1"
-                     style="--slide-bg: url('https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=1600&auto=format&fit=crop&q=80')">
+                     style="--slide-bg: url('{{ asset('images/hero/hero-slide-2.webp') }}')">
                     <div class="banner-slide__bg"></div>
                     <div class="banner-slide__overlay"></div>
                     <div class="banner-slide__content">
@@ -47,7 +47,7 @@
 
                 {{-- Slide 3: Nasi Uduk & Chicken Katsu --}}
                 <div class="banner-slide" data-slide-index="2"
-                     style="--slide-bg: url('https://images.unsplash.com/photo-1512058564366-18510be2db19?w=1600&auto=format&fit=crop&q=80')">
+                     style="--slide-bg: url('{{ asset('images/hero/hero-slide-3.webp') }}')">
                     <div class="banner-slide__bg"></div>
                     <div class="banner-slide__overlay"></div>
                     <div class="banner-slide__content">
@@ -67,7 +67,7 @@
 
                 {{-- Slide 4: Bolen Pisang & Donat Kentang --}}
                 <div class="banner-slide" data-slide-index="3"
-                     style="--slide-bg: url('https://images.unsplash.com/photo-1551024601-bec78aea704b?w=1600&auto=format&fit=crop&q=80')">
+                     style="--slide-bg: url('{{ asset('images/hero/hero-slide-4.webp') }}')">
                     <div class="banner-slide__bg"></div>
                     <div class="banner-slide__overlay"></div>
                     <div class="banner-slide__content">

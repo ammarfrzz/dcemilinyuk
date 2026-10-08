@@ -11,7 +11,7 @@
             @foreach ($categories as $key => $category)
                 <div class="cat-card" data-category-filter="{{ $key }}" role="button" tabindex="0">
                     <div class="cat-card__thumb">
-                        <img src="{{ $category['image'] ?? 'https://images.unsplash.com/photo-1541529086526-db283c563270?w=600&auto=format&fit=crop&q=80' }}"
+                        <img src="{{ $category['image'] ?? 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&fm=webp&q=80' }}"
                              alt="{{ $category['name'] }}" loading="lazy" class="cat-card__img">
                         <div class="cat-card__overlay"></div>
                         <div class="cat-card__icon-badge">

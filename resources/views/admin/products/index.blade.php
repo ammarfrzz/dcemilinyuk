@@ -57,15 +57,11 @@
                     @forelse ($products as $product)
                         <tr>
                             <td>
-                                @if ($product->image_path && file_exists(public_path('images/' . $product->image_path)))
-                                    <img src="{{ asset('images/' . $product->image_path) }}" 
-                                         alt="{{ $product->name }}" 
-                                         class="product-photo-thumb">
-                                @else
-                                    <div class="product-photo-thumb">
-                                        <i class="fa-solid fa-utensils"></i>
-                                    </div>
-                                @endif
+                                <img src="{{ $product->image_url }}" 
+                                     alt="{{ $product->name }}" 
+                                     class="product-photo-thumb"
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?w=120&auto=format&fit=crop&fm=webp&q=80';">
                             </td>
                             <td class="product-info-cell">
                                 <div class="prod-title">{{ $product->name }}</div>

@@ -3,7 +3,7 @@
     <div class="container">
         <div class="cta-banner" data-cta-banner>
             <div class="cta-banner__bg"
-                 style="background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&auto=format&fit=crop&q=80')"></div>
+                 style="background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&auto=format&fit=crop&fm=webp&q=85')"></div>
             <div class="cta-banner__overlay"></div>
             <div class="cta-banner__content">
                 <span class="cta-banner__badge">
