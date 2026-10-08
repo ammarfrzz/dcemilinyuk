@@ -131,6 +131,36 @@ class Product extends Model
         return 'Rp ' . number_format($this->price, 0, ',', '.');
     }
 
+    public function getDisplayCategoryAttribute(): string
+    {
+        return self::CATEGORIES[$this->category]['name'] ?? $this->category;
+    }
+
+    public function getSkuAttribute(): string
+    {
+        return 'DC-' . str_pad((string) $this->id, 3, '0', STR_PAD_LEFT);
+    }
+
+    public function getStockAttribute(): int
+    {
+        return $this->attributes['stock'] ?? 45;
+    }
+
+    public function getMinStockAttribute(): int
+    {
+        return $this->attributes['min_stock'] ?? 10;
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return ($this->available ?? true) ? 'Tersedia' : 'Habis';
+    }
+
+    public function getStatusClassAttribute(): string
+    {
+        return ($this->available ?? true) ? 'badge-success' : 'badge-danger';
+    }
+
     /** URL gambar: mengutamakan image_path database/input, lalu mapping lokal, lalu kategori */
     public function getImageUrlAttribute(): string
     {

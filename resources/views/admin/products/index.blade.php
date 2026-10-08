@@ -242,10 +242,19 @@
 <script>
     function openEditProductModal(product) {
         document.getElementById('edit_name').value = product.name || '';
-        document.getElementById('edit_sku').value = product.sku || '';
-        document.getElementById('edit_category').value = product.category_name || '';
+        document.getElementById('edit_sku').value = product.sku || ('DC-00' + (product.id || ''));
+        
+        const catSelect = document.getElementById('edit_category');
+        const targetCat = (product.display_category || product.category_name || product.category || '').toLowerCase();
+        for (let i = 0; i < catSelect.options.length; i++) {
+            if (catSelect.options[i].value.toLowerCase() === targetCat) {
+                catSelect.selectedIndex = i;
+                break;
+            }
+        }
+        
         document.getElementById('edit_price').value = product.price || 0;
-        document.getElementById('edit_stock').value = product.stock || 0;
+        document.getElementById('edit_stock').value = product.stock || 45;
         document.getElementById('edit_min_stock').value = product.min_stock || 10;
         document.getElementById('edit_desc').value = product.description || '';
         document.getElementById('formEditProduct').action = `/admin/products/${product.id}`;
