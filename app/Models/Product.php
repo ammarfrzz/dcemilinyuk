@@ -62,6 +62,7 @@ class Product extends Model
         'Es Teh Tarik' => 'products/es-teh-tarik.webp',
         'Kopi Susu' => 'products/kopi-susu.webp',
         'Es Buah' => 'products/es-buah.webp',
+        'Es Kepiting' => 'products/es-kepiting.webp',
         'Lemper Ayam' => 'products/lemper-ayam.webp',
         'Nasi Uduk' => 'products/nasi-uduk.webp',
         'Chicken Katsu' => 'products/chicken-katsu.webp',

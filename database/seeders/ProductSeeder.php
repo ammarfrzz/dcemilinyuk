@@ -131,7 +131,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Chicken Katsu',
                 'category' => 'MAKANAN',
-                'description' => 'Katsu ayam crispy dengan saus katsu manis gurih.',
+                'description' => 'Katsu ayam fillet tebal super crispy di luar dan juicy di dalam, disajikan hangat dengan saus katsu gurih manis spesial.',
                 'price' => 18000,
                 'image_path' => 'products/chicken-katsu.webp',
                 'rating' => 4.7,
@@ -162,7 +162,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Donat Kentang',
                 'category' => 'KUE',
-                'description' => 'Donat kentang lembut dengan aneka topping manis.',
+                'description' => 'Donat kentang jadul tekstur super lembut dan empuk, ditaburi gula halus salju dan aneka topping coklat keju nikmat.',
                 'price' => 5000,
                 'image_path' => 'products/donat-kentang.webp',
                 'rating' => 4.6,

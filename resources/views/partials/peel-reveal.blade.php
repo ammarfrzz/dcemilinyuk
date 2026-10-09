@@ -34,8 +34,8 @@
                 </div>
             </div>
             <div class="peel__image">
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&fm=webp&q=80"
-                     alt="Suasana DcemilinYuk" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&auto=format&fit=crop&q=80"
+                     alt="Sajian Lezat DcemilinYuk" loading="lazy">
             </div>
         </div>
     </div>
