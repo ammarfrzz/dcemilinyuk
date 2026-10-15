@@ -10,8 +10,8 @@
         {{-- Filter tab kategori (Semua + tiap kategori dari DB metadata) --}}
         <div class="product-tabs" id="product-tabs">
             <button class="product-tab product-tab--active" data-filter="all">Semua</button>
-            @foreach ($categories as $key => $category)
-                <button class="product-tab" data-filter="{{ $key }}">{{ $category['name'] }}</button>
+            @foreach ($categories as $category)
+                <button class="product-tab" data-filter="{{ $category->code }}">{{ $category->name }}</button>
             @endforeach
         </div>
 
@@ -26,7 +26,7 @@
                              class="product-card__img" loading="lazy">
                     </div>
                     <div class="product-card__body">
-                        <div class="product-card__category">{{ $categories[$product->category]['name'] ?? $product->category }}</div>
+                        <div class="product-card__category">{{ $product->display_category }}</div>
                         <h4 class="product-card__name">{{ $product->name }}</h4>
                         <p class="product-card__desc text-body">{{ $product->description }}</p>
                         <div class="product-card__footer">
@@ -43,7 +43,7 @@
                                 data-price="{{ $product->price }}"
                                 data-formatted-price="{{ $product->formatted_price }}"
                                 data-image="{{ $product->image_url }}"
-                                data-category="{{ $categories[$product->category]['name'] ?? $product->category }}">
+                                data-category="{{ $product->display_category }}">
                             <span>Pesan Sekarang</span>
                             <i class="fa-solid fa-cart-shopping"></i>
                         </button>

@@ -2,11 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
+    use HasFactory;
+
+    public const STATUS_AWAITING_PAYMENT = 'Menunggu Pembayaran';
+    public const STATUS_PROCESSING = 'Diproses';
+    public const STATUS_SHIPPED = 'Dikirim';
+    public const STATUS_COMPLETED = 'Selesai';
+    public const STATUS_CANCELLED = 'Dibatalkan';
+
+    public const PAYMENT_STATUS_PENDING = 'pending';
+    public const PAYMENT_STATUS_PENDING_VERIFICATION = 'pending_verification';
+    public const PAYMENT_STATUS_COD_PENDING = 'cod_pending';
+    public const PAYMENT_STATUS_PAID = 'paid';
+
+    public const STATUSES = [
+        self::STATUS_AWAITING_PAYMENT,
+        self::STATUS_PROCESSING,
+        self::STATUS_SHIPPED,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+
     protected $fillable = [
         'order_number',
         'customer_name',
@@ -44,6 +66,36 @@ class Order extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'customer_email', 'email');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', '!=', self::STATUS_CANCELLED);
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('payment_status', 'paid');
+    }
+
+    public function scopeAwaitingPayment($query)
+    {
+        return $query->where('payment_status', self::PAYMENT_STATUS_PENDING);
+    }
+
+    public function getSubtotalAttribute(): int
+    {
+        return $this->unit_price * $this->items_count;
+    }
+
+    public function getFormattedSubtotalAttribute(): string
+    {
+        return 'Rp ' . number_format($this->subtotal, 0, ',', '.');
+    }
+
     public function getFormattedTotalAttribute(): string
     {
         return 'Rp ' . number_format($this->total_amount, 0, ',', '.');
@@ -77,12 +129,22 @@ class Order extends Model
     public function getStatusBadgeClassAttribute(): string
     {
         return match ($this->status) {
-            'Selesai' => 'badge-success',
-            'Diproses' => 'badge-warning',
-            'Dikirim' => 'badge-info',
-            'Dibatalkan' => 'badge-danger',
-            'Menunggu Pembayaran' => 'badge-secondary',
+            self::STATUS_COMPLETED => 'badge-success',
+            self::STATUS_PROCESSING => 'badge-warning',
+            self::STATUS_SHIPPED => 'badge-info',
+            self::STATUS_CANCELLED => 'badge-danger',
+            self::STATUS_AWAITING_PAYMENT => 'badge-secondary',
             default => 'badge-secondary',
         };
+    }
+
+    public function getIsCancelledAttribute(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public function getFormattedServiceFeeAttribute(): string
+    {
+        return 'Rp ' . number_format($this->service_fee, 0, ',', '.');
     }
 }

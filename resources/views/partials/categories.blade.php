@@ -8,19 +8,19 @@
         </div>
 
         <div class="categories-grid" data-stagger-reveal data-reveal-target=".cat-card">
-            @foreach ($categories as $key => $category)
-                <div class="cat-card" data-category-filter="{{ $key }}" role="button" tabindex="0">
+            @foreach ($categories as $category)
+                <div class="cat-card" data-category-filter="{{ $category->code }}" role="button" tabindex="0">
                     <div class="cat-card__thumb">
-                        <img src="{{ $category['image'] ?? 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&fm=webp&q=80' }}"
-                             alt="{{ $category['name'] }}" loading="lazy" class="cat-card__img">
+                        <img src="{{ $category->image_url }}"
+                             alt="{{ $category->name }}" loading="lazy" class="cat-card__img">
                         <div class="cat-card__overlay"></div>
                         <div class="cat-card__icon-badge">
-                            <i class="{{ $category['icon'] }}"></i>
+                            <i class="{{ $category->icon }}"></i>
                         </div>
                     </div>
                     <div class="cat-card__body">
-                        <h4 class="cat-card__name">{{ $category['name'] }}</h4>
-                        <p class="cat-card__desc text-body">{{ $category['description'] }}</p>
+                        <h4 class="cat-card__name">{{ $category->name }}</h4>
+                        <p class="cat-card__desc text-body">{{ $category->description }}</p>
                         <div class="cat-card__action">
                             <span>Lihat Produk</span>
                             <i class="fa-solid fa-arrow-right"></i>

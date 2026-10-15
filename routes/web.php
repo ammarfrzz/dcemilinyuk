@@ -5,7 +5,9 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminStockController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +39,7 @@ Route::prefix('admin')->middleware('admin.auth')->name('admin.')->group(function
     // 2. Riwayat Pesanan
     Route::get('/riwayat-pesanan', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders', [AdminOrderController::class, 'index']); // Alias
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
 
     // 3. Manage Produk
@@ -51,9 +54,23 @@ Route::prefix('admin')->middleware('admin.auth')->name('admin.')->group(function
     Route::get('/categories', [AdminCategoryController::class, 'index']); // Alias
     Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 
     // 5. Manage Stock
     Route::get('/manage-stock', [AdminStockController::class, 'index'])->name('stock.index');
     Route::get('/stock', [AdminStockController::class, 'index']); // Alias
     Route::post('/stock/{id}/restock', [AdminStockController::class, 'restock'])->name('stock.restock');
+    Route::put('/stock/{id}', [AdminStockController::class, 'update'])->name('stock.update');
+
+    // 6. Manage Pengaturan Toko
+    Route::get('/manage-pengaturan', [AdminSettingController::class, 'index'])->name('settings.index');
+    Route::put('/manage-pengaturan', [AdminSettingController::class, 'update'])->name('settings.update');
+
+    // 7. Kelola Pengguna (khusus Super Admin)
+    Route::middleware('superadmin')->group(function () {
+        Route::get('/manage-pengguna', [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    });
 });

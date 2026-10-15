@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use HasFactory;
+
     public const CATEGORY_CEMILAN = 'CEMILAN';
     public const CATEGORY_MINUMAN = 'MINUMAN';
     public const CATEGORY_MAKANAN = 'MAKANAN';
@@ -83,6 +88,8 @@ class Product extends Model
         'rating',
         'sold',
         'available',
+        'stock',
+        'min_stock',
     ];
 
     protected function casts(): array
@@ -92,6 +99,8 @@ class Product extends Model
             'sold' => 'integer',
             'rating' => 'decimal:1',
             'available' => 'boolean',
+            'stock' => 'integer',
+            'min_stock' => 'integer',
         ];
     }
 
@@ -100,9 +109,46 @@ class Product extends Model
         return $query->where('available', true);
     }
 
+    public function scopeInStock($query)
+    {
+        return $query->where('available', true)->where('stock', '>', 0);
+    }
+
+    public function scopeLowStock($query)
+    {
+        return $query->whereColumn('stock', '<=', 'min_stock');
+    }
+
     public function scopeBestSellers($query, int $limit = 8)
     {
         return $query->available()->orderByDesc('sold')->limit($limit)->get();
+    }
+
+    public function scopeCategory($query, ?string $category)
+    {
+        return $query->when($category, fn ($q) => $q->where('category', $category));
+    }
+
+    public function scopeSearch($query, ?string $term)
+    {
+        return $query->when($term, fn ($q) => $q->where('name', 'like', '%' . $term . '%'));
+    }
+
+    /**
+     * Relasi ke tabel categories lewat kolom `category` (kode kategori).
+     *
+     * Nama method memakai akhiran Info supaya tidak bentrok dengan atribut
+     * string `category` yang dipakai sebagai kode kategori.
+     */
+    public function categoryInfo(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category', 'code');
+    }
+
+    /** Relasi ke orders (produk ini pernah dipesan) */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     /** Label badge untuk tampilan: best_seller → Best Seller, dst. */
@@ -134,6 +180,11 @@ class Product extends Model
 
     public function getDisplayCategoryAttribute(): string
     {
+        // Ambil dari relasi categoryInfo jika sudah di-eager load, fallback ke constant CATEGORIES
+        if ($this->relationLoaded('categoryInfo') && $this->categoryInfo) {
+            return $this->categoryInfo->name;
+        }
+
         return self::CATEGORIES[$this->category]['name'] ?? $this->category;
     }
 
@@ -144,22 +195,55 @@ class Product extends Model
 
     public function getStockAttribute(): int
     {
-        return $this->attributes['stock'] ?? 45;
+        return (int) ($this->attributes['stock'] ?? 45);
     }
 
     public function getMinStockAttribute(): int
     {
-        return $this->attributes['min_stock'] ?? 10;
+        return (int) ($this->attributes['min_stock'] ?? 10);
+    }
+
+    /** True kalau stok menipis (kurang dari min_stock) dan masih tersedia. */
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->stock <= $this->min_stock;
+    }
+
+    /** Label status inventaris untuk halaman admin Manage Stock. */
+    public function getStockStatusLabelAttribute(): string
+    {
+        return match (true) {
+            $this->stock <= 0 => 'Kritis',
+            $this->stock <= $this->min_stock => 'Perlu Restock',
+            default => 'Aman',
+        };
+    }
+
+    public function getStockStatusClassAttribute(): string
+    {
+        return match (true) {
+            $this->stock <= 0 => 'badge-danger',
+            $this->stock <= $this->min_stock => 'badge-warning',
+            default => 'badge-success',
+        };
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return ($this->available ?? true) ? 'Tersedia' : 'Habis';
+        if (! $this->available || $this->stock <= 0) {
+            return 'Habis';
+        }
+
+        return $this->is_low_stock ? 'Stok Menipis' : 'Tersedia';
     }
 
     public function getStatusClassAttribute(): string
     {
-        return ($this->available ?? true) ? 'badge-success' : 'badge-danger';
+        if (! $this->available || $this->stock <= 0) {
+            return 'badge-danger';
+        }
+
+        return $this->is_low_stock ? 'badge-warning' : 'badge-success';
     }
 
     /** URL gambar: mengutamakan image_path database/input, lalu mapping lokal, lalu kategori */
@@ -192,7 +276,12 @@ class Product extends Model
             }
         }
 
-        // 3. Fallback: Gambar kategori
+        // 3. Fallback: Gambar kategori dari database
+        if ($this->relationLoaded('categoryInfo') && $this->categoryInfo && $this->categoryInfo->image_path) {
+            return asset($this->categoryInfo->image_path);
+        }
+
+        // 4. Fallback: Gambar kategori dari constant
         if (isset(self::CATEGORIES[$this->category]['image'])) {
             return asset(self::CATEGORIES[$this->category]['image']);
         }

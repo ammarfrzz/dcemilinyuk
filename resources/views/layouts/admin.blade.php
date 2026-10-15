@@ -83,16 +83,32 @@
                         <i class="fa-solid fa-warehouse"></i>
                         <span>Manage Stock</span>
                     </a>
+
+                    {{-- 6. Manage Pengaturan --}}
+                    <a href="{{ route('admin.settings.index') }}" 
+                       class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Pengaturan Toko</span>
+                    </a>
+
+                    {{-- 7. Kelola Pengguna (Super Admin) --}}
+                    @if(auth()->user()?->isSuperAdmin())
+                        <a href="{{ route('admin.users.index') }}" 
+                           class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-users-gear"></i>
+                            <span>Kelola Pengguna</span>
+                        </a>
+                    @endif
                 </nav>
             </div>
 
             {{-- Bottom Admin User Profile --}}
             <div class="sidebar-footer">
-                <div class="user-meta-label">Logged in as Admin</div>
+                <div class="user-meta-label">Logged in as {{ auth()->user()?->role_label ?? 'Admin' }}</div>
                 <div class="user-profile-row">
                     <div class="user-info">
-                        <div class="user-name">{{ session('admin_name') ?? (Auth::user()->name ?? 'Hendra Wijaya') }}</div>
-                        <div class="user-email">{{ session('admin_email') ?? (Auth::user()->email ?? 'hendra@cemilin.com') }}</div>
+                        <div class="user-name">{{ auth()->user()?->name ?? 'Admin' }}</div>
+                        <div class="user-email">{{ auth()->user()?->email ?? '-' }}</div>
                     </div>
                     <form action="{{ route('admin.logout') }}" method="POST" style="margin: 0;">
                         @csrf

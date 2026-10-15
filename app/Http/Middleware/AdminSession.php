@@ -9,16 +9,38 @@ use Symfony\Component\HttpFoundation\Response;
 class AdminSession
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * Pastikan request berasal dari admin yang sudah login (Laravel Auth guard `web`).
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!session('admin_logged_in')) {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()
+                ->guest(route('login'))
+                ->with('info', 'Silakan masuk terlebih dahulu untuk mengakses panel admin.');
+        }
+
+        if (! $user->isAdmin()) {
+            auth()->logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
             return redirect()
                 ->route('login')
-                ->with('info', 'Silakan masuk terlebih dahulu untuk mengakses panel admin.');
+                ->with('error', 'Akun Anda tidak punya akses ke panel admin.');
+        }
+
+        if (! $user->is_active) {
+            auth()->logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()
+                ->route('login')
+                ->with('error', 'Akun Anda sedang dinonaktifkan. Hubungi super admin.');
         }
 
         return $next($request);

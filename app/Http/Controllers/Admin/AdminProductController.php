@@ -3,97 +3,27 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminProductController extends Controller
 {
-    /**
-     * Data dummy produk sebagai fallback jika database kosong
-     */
-    public static function getDummyProducts()
-    {
-        return collect([
-            (object) [
-                'id' => 1,
-                'name' => 'Nugget Ayam Premium',
-                'sku' => 'DC-001',
-                'category_name' => 'Frozen',
-                'display_category' => 'Frozen',
-                'price' => 48000,
-                'formatted_price' => 'Rp 48.000',
-                'stock' => 45,
-                'min_stock' => 10,
-                'status_class' => 'badge-success',
-                'status_label' => 'Tersedia',
-                'stock_status_class' => 'badge-success',
-                'stock_status_label' => 'Aman',
-                'image_path' => 'products/chicken-katsu.webp',
-                'image_url' => asset('images/products/chicken-katsu.webp'),
-                'description' => 'Dibuat dari 100% daging ayam fillet segar pilihan tanpa bahan pengawet.',
-                'updated_at' => now()->subHours(1),
-            ],
-            (object) [
-                'id' => 2,
-                'name' => 'Siomay Frozen Premium',
-                'sku' => 'DC-002',
-                'category_name' => 'Frozen',
-                'display_category' => 'Frozen',
-                'price' => 35000,
-                'formatted_price' => 'Rp 35.000',
-                'stock' => 8,
-                'min_stock' => 15,
-                'status_class' => 'badge-warning',
-                'status_label' => 'Stok Rendah',
-                'stock_status_class' => 'badge-warning',
-                'stock_status_label' => 'Perlu Restock',
-                'image_path' => 'products/siomay.webp',
-                'image_url' => asset('images/products/siomay.webp'),
-                'description' => 'Siomay ayam kukus lengkap dengan bumbu kacang gurih legit.',
-                'updated_at' => now()->subHours(3),
-            ],
-            (object) [
-                'id' => 3,
-                'name' => 'Risol Mayo Smoked Beef',
-                'sku' => 'DC-003',
-                'category_name' => 'Cemilan',
-                'display_category' => 'Cemilan',
-                'price' => 25000,
-                'formatted_price' => 'Rp 25.000',
-                'stock' => 2,
-                'min_stock' => 10,
-                'status_class' => 'badge-danger',
-                'status_label' => 'Kritis',
-                'stock_status_class' => 'badge-danger',
-                'stock_status_label' => 'Kritis',
-                'image_path' => 'products/risol-mayo.webp',
-                'image_url' => asset('images/products/risol-mayo.webp'),
-                'description' => 'Isian smoked beef premium, keju cheddar gurih, dan mayones melimpah.',
-                'updated_at' => now()->subHours(5),
-            ],
-        ]);
-    }
-
     public function index(Request $request)
     {
         $query = Product::query();
 
         // Filter kategori
         if ($request->filled('category') && $request->category !== 'Semua') {
-            $cat = strtoupper($request->category);
-            // Cek apakah match langsung atau via display name
-            $matchedKey = null;
-            foreach (Product::CATEGORIES as $key => $meta) {
-                if (strtoupper($key) === $cat || strtoupper($meta['name']) === $cat) {
-                    $matchedKey = $key;
-                    break;
-                }
-            }
-            if ($matchedKey) {
-                $query->where('category', $matchedKey);
-            } else {
-                $query->where('category', $request->category);
-            }
+            $matchedKey = self::matchCategoryCode($request->category);
+            $query->when($matchedKey, fn ($q) => $q->where('category', $matchedKey));
+        }
+
+        // Filter ketersediaan
+        if ($request->filled('availability') && $request->availability !== 'Semua') {
+            $query->where('available', $request->availability === 'Tersedia');
         }
 
         // Filter pencarian
@@ -101,25 +31,15 @@ class AdminProductController extends Controller
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
             });
         }
 
         $totalProductsCount = Product::count();
-        $products = $query->orderBy('id', 'desc')->paginate(8)->withQueryString();
+        $products = $query->orderByDesc('id')->paginate(8)->withQueryString();
 
-        // Ambil daftar kategori dari Product::CATEGORIES
-        $categories = collect(Product::CATEGORIES)->map(function ($cat, $key) {
-            return (object) [
-                'id' => $key,
-                'code' => $key,
-                'name' => $cat['name'],
-                'key' => $key,
-                'description' => $cat['description'] ?? '',
-                'is_active' => true,
-            ];
-        });
+        $categories = Category::active()->ordered()->get();
 
         return view('admin.products.index', [
             'products' => $products,
@@ -133,31 +53,45 @@ class AdminProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_name' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0|max:99999999',
+            'description' => 'nullable|string|max:1000',
+            'stock' => 'nullable|integer|min:0|max:100000',
+            'min_stock' => 'nullable|integer|min:0|max:100000',
+            'badge' => 'nullable|in:best_seller,baru,pedas',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'whatsapp_order_link' => 'nullable|url|max:255',
+        ], [
+            'name.required' => 'Nama produk wajib diisi.',
+            'category_name.required' => 'Kategori wajib dipilih.',
+            'price.required' => 'Harga wajib diisi.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
+        ], [
+            'category_name' => 'kategori',
         ]);
 
-        // Normalisasi kategori
-        $categoryKey = strtoupper($request->input('category_name'));
-        foreach (Product::CATEGORIES as $key => $meta) {
-            if (strtoupper($meta['name']) === $categoryKey || strtoupper($key) === $categoryKey) {
-                $categoryKey = $key;
-                break;
-            }
-        }
+        // Normalisasi kategori (terima code maupun nama display)
+        $categoryKey = self::matchCategoryCode($validated['category_name'])
+            ?? strtoupper($validated['category_name']);
 
-        Product::create([
+        $stock = $validated['stock'] ?? 45;
+
+        $product = Product::create([
             'name' => $validated['name'],
             'category' => $categoryKey,
             'price' => (int) $validated['price'],
             'description' => $validated['description'] ?? '',
-            'available' => true,
+            'badge' => $validated['badge'] ?? null,
+            'stock' => $stock,
+            'min_stock' => $validated['min_stock'] ?? 10,
+            'available' => $stock > 0,
             'rating' => 5.0,
             'sold' => 0,
+            'image_path' => $this->handleImageUpload($request),
+            'whatsapp_order_link' => $validated['whatsapp_order_link'] ?? null,
         ]);
 
         return redirect()->route('admin.products.index')
-            ->with('success', "Produk baru '{$validated['name']}' berhasil ditambahkan ke katalog!");
+            ->with('success', "Produk baru '{$product->name}' berhasil ditambahkan ke katalog!");
     }
 
     public function update(Request $request, $id)
@@ -165,29 +99,47 @@ class AdminProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_name' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0|max:99999999',
+            'description' => 'nullable|string|max:1000',
+            'stock' => 'nullable|integer|min:0|max:100000',
+            'min_stock' => 'nullable|integer|min:0|max:100000',
+            'badge' => 'nullable|in:best_seller,baru,pedas',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'whatsapp_order_link' => 'nullable|url|max:255',
+            'remove_image' => 'nullable|boolean',
         ]);
 
         $product = Product::findOrFail($id);
 
-        $categoryKey = $product->category;
-        if ($request->filled('category_name')) {
-            $catInput = strtoupper($request->input('category_name'));
-            foreach (Product::CATEGORIES as $key => $meta) {
-                if (strtoupper($meta['name']) === $catInput || strtoupper($key) === $catInput) {
-                    $categoryKey = $key;
-                    break;
-                }
-            }
-        }
-
-        $product->update([
+        $data = [
             'name' => $validated['name'],
-            'category' => $categoryKey,
             'price' => (int) $validated['price'],
             'description' => $validated['description'] ?? $product->description,
-        ]);
+            'badge' => $validated['badge'] ?? null,
+            'min_stock' => $validated['min_stock'] ?? $product->min_stock,
+            'whatsapp_order_link' => $validated['whatsapp_order_link'] ?? null,
+        ];
+
+        if ($request->filled('category_name')) {
+            $data['category'] = self::matchCategoryCode($validated['category_name'])
+                ?? strtoupper($validated['category_name']);
+        }
+
+        if ($request->has('stock')) {
+            $data['stock'] = $validated['stock'];
+            $data['available'] = $validated['stock'] > 0;
+        }
+
+        // Upload gambar baru (hapus gambar lama di storage jika ada)
+        if ($request->hasFile('image')) {
+            $this->deleteStoredImage($product->image_path);
+            $data['image_path'] = $this->handleImageUpload($request);
+        } elseif ($request->boolean('remove_image')) {
+            $this->deleteStoredImage($product->image_path);
+            $data['image_path'] = null;
+        }
+
+        $product->update($data);
 
         return redirect()->route('admin.products.index')
             ->with('success', "Data produk '{$product->name}' berhasil diperbarui!");
@@ -196,10 +148,75 @@ class AdminProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+
+        // Order lama tetap referring ke produk, jadi jangan cascade hapus diam-diam
+        if ($product->orders()->exists()) {
+            return redirect()->route('admin.products.index')
+                ->with('error', "Produk '{$product->name}' tidak bisa dihapus karena sudah memiliki riwayat pesanan. Nonaktifkan produk sebagai gantinya.");
+        }
+
+        $this->deleteStoredImage($product->image_path);
+
         $name = $product->name;
         $product->delete();
 
         return redirect()->route('admin.products.index')
             ->with('success', "Produk '{$name}' berhasil dihapus dari sistem.");
+    }
+
+    /**
+     * Simpan gambar produk ke storage publik dan kembalikan path relatifnya.
+     */
+    private function handleImageUpload(Request $request): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return null;
+        }
+
+        $file = $request->file('image');
+        $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))
+            . '-' . Str::random(6)
+            . '.' . $file->getClientOriginalExtension();
+
+        $path = $file->storeAs('products', $filename, 'public');
+
+        return 'storage/' . $path;
+    }
+
+    /**
+     * Hapus file gambar yang tersimpan di storage publik saja (bukan gambar bawaan repo).
+     */
+    private function deleteStoredImage(?string $imagePath): void
+    {
+        if (! $imagePath || ! str_starts_with($imagePath, 'storage/')) {
+            return;
+        }
+
+        Storage::disk('public')->delete(str_replace('storage/', '', $imagePath));
+    }
+
+    /**
+     * Cocokkan input kategori (code / nama) dengan kode kategori yang valid.
+     * Cek database dulu, lalu fallback ke metadata hardcoded.
+     */
+    private static function matchCategoryCode(string $input): ?string
+    {
+        $needle = strtoupper(trim($input));
+
+        $fromDb = Category::whereRaw('UPPER(code) = ?', [$needle])
+            ->orWhereRaw('UPPER(name) = ?', [$needle])
+            ->value('code');
+
+        if ($fromDb) {
+            return $fromDb;
+        }
+
+        foreach (Product::CATEGORIES as $code => $meta) {
+            if (strtoupper($code) === $needle || strtoupper($meta['name']) === $needle) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 }

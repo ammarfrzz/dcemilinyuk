@@ -1,204 +1,209 @@
-# DcemilinYuk — Laravel
+# D'Cemilinyuk
 
-Website katalog cemilan dan minuman dari pedagang kecil lokal Indonesia. Konversi dari versi [React](https://github.com/ZhyperReyz/dcemilinyuk-web) ke **Laravel + Blade** dengan animasi yang sama persis.
+Toko online cemilan & minuman (**cemilan, minuman, makanan, kue, frozen**) yang dibangun dengan Laravel 12.
 
-## Tech Stack
+Pelanggan menjelajahi katalog, membuka formulir pemesanan, lalu menyelesaikan checkout
+multi-step: isi data pengiriman → pilih metode pembayaran (transfer bank / QRIS / COD)
+→ halaman pesanan berhasil dengan tombol konfirmasi WhatsApp.
 
-- **Laravel** + Blade templating
-- **Vite** + laravel-vite-plugin — build tool asset
-- **GSAP** + ScrollTrigger — animasi scroll
-- **Lenis** — smooth scroll
-- **SQLite** (default) / MySQL — database produk
-- **Vanilla CSS** — custom properties, dark theme
+Sisi admin menyediakan dashboard metrik, pengelolaan produk & kategori, manajemen stok,
+Riwayat pesanan, pengaturan toko, serta (khusus super admin) pengelolaan pengguna.
 
-## Fitur & Animasi
+---
 
-| Section | Animasi |
-|---------|---------|
-| **Preloader** | Counter animasi 000-100 + curtain reveal |
-| **Navbar** | Horizontal fixed, active underline, scroll blur effect |
-| **Hero** | Word-by-word text reveal + parallax background |
-| **Categories** | Scroll reveal cards |
-| **Products** | Filter tab kategori + WA order button (data dari DB) |
-| **PeelReveal** | Horizontal bars peel away on scroll |
-| **Featured** | Best seller cards dengan hover lift |
-| **SpecialtyDrinks** | Text scatter on hover |
-| **Gallery** | Clip-path image reveals |
-| **HorizontalScroll** | Horizontal gallery dengan GSAP pin + scroll |
-| **About** | Clip-path reveal + stat counter animation |
-| **HowToOrder** | Step cards dengan staggered reveal |
-| **Testimonials** | Auto-rotating quotes |
-| **CTA** | Scale-in WhatsApp banner |
+## Stack
 
-## Data Produk (dari database)
+| Bagian | Teknologi |
+|---|---|
+| Framework | Laravel 12 (PHP 8.4) |
+| Database | SQLite (default, mudah untuk dev) |
+| Frontend | Blade + CSS/JS kustom, Vite |
+| Autentikasi | Laravel Auth (`web` guard) + session |
+| Testing | PHPUnit / Pest (133 test) |
 
-```
-CEMILAN    — Risol Mayo, Siomay, Lumpiah, Piscok, Sosis Bakar, Tahu Gejrot
-MINUMAN    — Es Teh Tarik, Kopi Susu, Es Kepiting
-MAKANAN    — Lemper Ayam, Nasi Uduk, Chicken Katsu, Bakso Mercon
-KUE        — Bolen Pisang, Donat Kentang
-FROZEN     — Sweet Potato Fries
-```
-
-Data tidak lagi hardcoded seperti versi React — produk diambil dari tabel `products` via `Product` model dan dirender dengan `@foreach` di Blade.
-
-## Instalasi
-
-```bash
-# 1. Install dependency PHP
-composer install
-
-# 2. Setup environment
-cp .env.example .env
-php artisan key:generate
-
-# 3. (Opsional) ganti driver database di .env, default sqlite
-# DB_CONNECTION=sqlite
-
-# 4. Migration + seeder (16 produk)
-php artisan migrate --seed
-
-# 5. Install dependency npm
-npm install
-
-# 6. Build asset produksi
-npm run build
-```
+---
 
 ## Menjalankan
 
 ```bash
-# Dev server Laravel + Vite (hot reload blade & asset)
-composer dev
-# atau manual:
-php artisan serve
-npm run dev
+composer install
+npm install
 
-# Build untuk production
-npm run build
+cp .env.example .env
+php artisan key:generate
+
+php artisan migrate:fresh --seed   # buat tabel + data contoh
+php artisan storage:link           # supaya upload gambar produk bisa diakses
+
+php artisan serve                  # http://127.0.0.1:8000
+npm run dev                        # aset frontend (opsional, sudah ada build di public/)
 ```
 
-Buka `http://127.0.0.1:8000`.
+### Akun contoh (dari seeder)
 
-> **Catatan Windows/XAMPP:** bila CLI PHP tidak memuat `php.ini` (ekstensi `mbstring`, `openssl`, `pdo_sqlite` tidak aktif), jalankan dengan config tambahan yang ada di root workspace:
-> ```bash
-> php -c ../php-cli.ini artisan serve
-> ```
+| Email | Password | Role |
+|---|---|---|
+| `superadmin@dcemilinyuk.id` | `password` | Super Admin |
+| `admin@dcemilinyuk.id` | `password` | Admin |
+| `pelanggan@dcemilinyuk.id` | `password` | Pelanggan |
 
-## Konfigurasi WhatsApp
+> ⚠️ **Ganti password seeder sebelum deploy ke server publik.**
+> Ganti juga `DCEMILINYUK_WA_NUMBER` dan rekening bank di **Pengaturan Toko**.
 
-Nomor WA tujuan order diatur lewat config/env (lihat `config/dcemilinyuk.php`):
+---
 
-```env
-DCEMILINYUK_WA_NUMBER=6281234567890
-```
-
-Tombol **"Pesan via WA"** di tiap produk otomatis membuat link:
+## Struktur
 
 ```
-https://wa.me/6281234567890?text=Halo, saya ingin pesan: *<Nama Produk>* Harga: Rp XX.000 ...
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/          # auth, dashboard, produk, kategori, stok, pesanan, pengaturan, pengguna
+│   │   ├── Api/            # endpoint JSON: produk, kategori, pesanan, settings
+│   │   ├── CheckoutController.php
+│   │   └── HomeController.php
+│   └── Middleware/
+│       ├── AdminSession.php        # guard area admin (login + role + aktif)
+│       ├── EnsureSuperAdmin.php    # khusus super admin
+│       └── ForceJsonResponse.php   # /api selalu JSON, termasuk error
+├── Models/
+│   ├── Category.php  Order.php  Product.php  Setting.php  User.php
+└── Services/
+    └── OrderService.php  # hitung ongkir/total, nomor pesanan, kurangi stok
+
+database/
+├── factories/  ProductFactory, CategoryFactory, UserFactory
+├── migrations/ users, products, orders, categories, settings
+└── seeders/    Setting, Category, Product, User, Order
+
+resources/views/
+├── home.blade.php + partials/   # landing page 10 seksi
+├── checkout/                   # payment, success
+└── admin/                      # dashboard, auth, produk, kategori, stok, pesanan, pengaturan, pengguna
+
+routes/
+├── web.php   # storefront + panel admin
+└── api.php   # JSON API
 ```
 
-Bila kolom `whatsapp_order_link` di tabel produk diisi manual, link itu yang dipakai (meng-override generate otomatis).
+---
 
-## Struktur Project
+## Database
 
-```
-dcemilinyuk-laravel/
-├── app/
-│   ├── Http/Controllers/
-│   │   └── HomeController.php        — kirim data produk ke view home
-│   ├── Models/
-│   │   └── Product.php               — model + metadata kategori + accessor badge/harga/WA
-│   └── Providers/
-│       └── DcemilinyukServiceProvider.php
-├── config/
-│   └── dcemilinyuk.php               — nomor WA & nama brand
-├── database/
-│   ├── migrations/
-│   │   └── xxxx_create_products_table.php
-│   └── seeders/
-│       └── ProductSeeder.php         — 16 produk dari data versi React
-├── public/
-│   ├── favicon.svg
-│   └── images/                       — foto produk & galeri
-│       └── products/
-├── resources/
-│   ├── css/
-│   │   └── app.css                   — global tokens, reset, utilities (dari styles/index.css)
-│   ├── js/
-│   │   ├── app.js                    — entry point, init semua section & animasi
-│   │   ├── lenis-init.js             — Lenis + sync GSAP ScrollTrigger (dari useLenis.ts)
-│   │   └── scroll-reveal.js          — helper reveal reusable (dari useScrollReveal.ts)
-│   └── views/
-│       ├── home.blade.php            — merangkai semua partial
-│       ├── layouts/
-│       │   └── app.blade.php         — head, fonts, body wrapper
-│       └── partials/
-│           ├── preloader.blade.php
-│           ├── navigation.blade.php
-│           ├── hero.blade.php
-│           ├── categories.blade.php
-│           ├── products.blade.php
-│           ├── peel-reveal.blade.php
-│           ├── featured.blade.php
-│           ├── specialty-drinks.blade.php
-│           ├── gallery.blade.php
-│           ├── horizontal-scroll.blade.php
-│           ├── about.blade.php
-│           ├── how-to-order.blade.php
-│           ├── testimonials.blade.php
-│           ├── cta.blade.php
-│           └── footer.blade.php
-├── routes/
-│   └── web.php                       — GET / → HomeController@index
-└── vite.config.js                    — laravel-vite-plugin, input css + js
+| Tabel | Isi |
+|---|---|
+| `users` | Admin & pelanggan. Kolom `role` (`user`/`admin`/`superadmin`), `is_active`, `last_login_at` |
+| `products` | Katalog. `category` menyimpan **kode** kategori, bukan enum, supaya kategori bebas ditambah |
+| `categories` | Kategori (code, nama, ikon, gambar, urutan, aktif/tidak) |
+| `orders` | Pesanan. `product_name`/`unit_price` disimpan sebagai snapshot agar riwayat tidak berubah |
+| `settings` | Konfigurasi toko (key-value): brand, ongkir, rekening, toggle COD |
+
+> Hubungan `products.category` → `categories.code` dibuat lewat relasi
+> `Product::categoryInfo()`. Namanya memakai akhiran *Info* supaya tidak bentrok
+> dengan kolom string `category` yang juga dipakai sebagai kode kategori untuk filter.
+
+---
+
+## API JSON
+
+Semua endpoint di bawah `/api` **selalu** merespons JSON (matahaleven tanpa header `Accept`).
+
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| `GET` | `/api/products` | Katalog. Query: `category`, `search`, `sort` (`newest`, `price_asc`, `price_desc`, `best_seller`, `name`), `per_page` (maks 60) |
+| `GET` | `/api/products/{id}` | Detail satu produk |
+| `GET` | `/api/categories` | Kategori aktif, terurut |
+| `GET` | `/api/settings` | Pengaturan publik + metode pembayaran yang aktif |
+| `POST` | `/api/orders` | Buat pesanan (validasi stok, hitung ongkir otomatis) |
+| `GET` | `/api/orders/{orderNumber}` | Lacak pesanan. Wajib menyertakan `?email=` atau `?phone=` sebagai verifikasi |
+
+Contoh:
+
+```bash
+curl "http://localhost:8000/api/products?sort=best_seller&per_page=5"
+
+curl -X POST http://localhost:8000/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"product_id":1,"customer_name":"Budi","customer_phone":"081234567890",
+       "shipping_address":"Jl. Merdeka 10","items_count":3}'
 ```
 
-## Urutan Section
+Bentuk respons produk konsisten antara `index` dan `show`:
 
-Sesuai README versi React:
-
-Preloader → Navbar → Hero → Categories → Products → PeelReveal → Featured → SpecialtyDrinks → Gallery → HorizontalScroll → About → HowToOrder → Testimonials → CTA → Footer
-
-## Brand Guidelines
-
-- **Font Display:** Playfair Display (Google Fonts)
-- **Font Body:** Inter (Google Fonts)
-- **Accent Color:** `#c8956c` (warm brown)
-- **Background:** `#0a0a0a` (near black)
-- **WhatsApp:** `#25D366`
-
-## Format & Konvensi
-
-- Harga dalam format **Rp XX.000** (accessor `formatted_price`)
-- Badge: `best_seller` → Best Seller, `baru` → Baru, `pedas` → Pedas
-- Kolom `category` enum: `CEMILAN` / `MINUMAN` / `MAKANAN` / `KUE` / `FROZEN`
-- Pesan via WhatsApp langsung dari halaman produk
-
-## Gambar Produk
-
-Seeder mengisi `image_path` seperti `products/risol-mayo.jpg`. Letakkan foto di:
-
-```
-public/images/products/risol-mayo.jpg
-public/images/products/siomay.jpg
-... dst
+```json
+{
+  "id": 1, "sku": "DC-001", "name": "Risol Mayo",
+  "category": "Cemilan", "category_code": "CEMILAN",
+  "price": 3000, "formatted_price": "Rp 3.000",
+  "rating": 4.9, "sold": 2100, "stock": 45,
+  "badge": "Best Seller",
+  "image_url": "http://localhost:8000/images/products/risol-mayo.webp",
+  "whatsapp_order_url": "https://wa.me/6281234567890?text=..."
+}
 ```
 
-Bila foto belum ada, otomatis fallback ke placeholder brand (`placehold.co` warna `#0a0a0a` / `#c8956c`).
+---
 
-## Catatan Porting dari React
+## Alur Checkout
 
-| React | Laravel |
-|-------|---------|
-| `hooks/useLenis.ts` | `resources/js/lenis-init.js` |
-| `hooks/useScrollReveal.ts` | `resources/js/scroll-reveal.js` (berbasis `data-attributes`) |
-| `data/products.ts` | `app/Models/Product.php` + `ProductSeeder` |
-| `App.tsx` (komposisi section) | `resources/views/home.blade.php` |
-| Komponen `.tsx` | `resources/views/partials/*.blade.php` |
-| `styles/index.css` | `resources/css/app.css` |
+1. **Simpan pesanan** — `OrderService` memvalidasi stok, menghitung ongkir
+   (gratis di atas `free_shipping_threshold`), biaya layanan, dan total,
+   lalu membuat nomor unik `ORD-YYYYMMDD-XXXX`.
+2. **Halaman pembayaran** — rekening diambil dari tabel `settings`;
+   bank yang nomornya kosong otomatis disembunyikan.
+3. **Konfirmasi** — `payment_status` berubah sesuai metode (COD tidak bisa dipilih
+   kalau `cod_enabled` dimatikan) dan stok **dikurangi sekali saja**,
+   bahkan kalau pembeli me-refresh halaman.
+4. **Pesanan berhasil** — template pesan WhatsApp otomatis untuk konfirmasi ke admin.
 
-## License
+---
 
-(c) 2026 DcemilinYuk. All rights reserved.
+## Manajemen Stok
+
+`products` punya `stock` dan `min_stock`. Admin punya:
+
+- **Restock** (`POST /admin/stock/{id}/restock`) — menambah stok; produk nonaktif otomatis aktif lagi.
+- **Set manual** (`PUT /admin/stock/{id}`) — untuk koreksi; stok `0` otomatis menandai produk habis.
+- **Status inventaris**: `Kritis` (≤ 0), `Perlu Restock` (≤ `min_stock`), `Aman`.
+
+Produk **tidak bisa dihapus** kalau sudah punya riwayat pesanan — nonaktifkan sebagai gantinya.
+
+---
+
+## Keamanan
+
+- Password admin di-hash otomatis (`password` cast), minimal 8 karakter.
+- Rate limit login: **5 percobaan gagal** → dikunci 1 menit.
+- Pesan error login sengaja dibuat generik agar tidak membocorkan info user.
+- `AdminSession` memeriksa login **dan** role **dan** status aktif; akun nonaktif langsung
+  di-logout paksa.
+- Area kelola pengguna dibatasi middleware `superadmin`, dan super admin terakhir
+  tidak bisa diturunkan, dinonaktifkan, atau dihapus.
+- Upload gambar dibatasi 2 MB dan tipe `jpg/jpeg/png/webp`; file lama dihapus
+  saat diganti.
+- Produksi: pastikan `APP_DEBUG=false`.
+
+---
+
+## Testing
+
+```bash
+php artisan test                        # semua
+php artisan test --testsuite=Unit       # model, accessor, scope, service
+php artisan test --testsuite=Feature    # HTTP, auth, API, upload, checkout
+```
+
+Cakupan: katalog & filter API, pembuatan & pelacakan pesanan, alur checkout 4 langkah,
+login admin (termasuk rate limit & akun nonaktif), CRUD produk + upload gambar,
+manajemen stok, filter pesanan, pengaturan toko, dan pengaturan pengguna.
+
+---
+
+## Checklist Sebelum Deploy
+
+- [ ] `php artisan migrate --force`
+- [ ] `php artisan storage:link`
+- [ ] Ganti password semua akun seeder
+- [ ] Isi rekening & nomor WhatsApp asli di **Pengaturan Toko**
+- [ ] `APP_DEBUG=false` di `.env`
+- [ ] `php artisan optimize` (config + route + view cache)
